@@ -146,7 +146,7 @@ const FamilyView = () => {
     };
 
     // =============================================
-    // تعريف الأنماط (styles) - ✅ يجب أن يكون هنا!
+    // ✅ تعريف الأنماط (styles) - هنا!
     // =============================================
     const styles = {
         container: {
@@ -168,16 +168,8 @@ const FamilyView = () => {
             borderRadius: '15px',
             boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
         },
-        headerH1: {
-            fontSize: '32px',
-            margin: 0,
-            color: '#2c3e50'
-        },
-        headerP: {
-            fontSize: '16px',
-            color: '#7f8c8d',
-            margin: '5px 0 0'
-        },
+        headerH1: { fontSize: '32px', margin: 0, color: '#2c3e50' },
+        headerP: { fontSize: '16px', color: '#7f8c8d', margin: '5px 0 0' },
         actions: {
             display: 'flex',
             gap: '10px',
@@ -188,78 +180,53 @@ const FamilyView = () => {
             borderRadius: '12px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
         },
-        btn: {
-            padding: '10px 24px',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '15px',
-            fontWeight: '600',
-            fontFamily: 'Cairo, sans-serif',
-            transition: 'all 0.3s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-        },
         addSponsorBtn: {
             padding: '10px 24px',
+            backgroundColor: '#9b59b6',
+            color: 'white',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
             fontSize: '15px',
             fontWeight: '600',
             fontFamily: 'Cairo, sans-serif',
-            transition: 'all 0.3s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: '#9b59b6',
-            color: 'white'
+            transition: 'all 0.3s ease'
         },
         addDependentBtn: {
             padding: '10px 24px',
+            backgroundColor: '#27ae60',
+            color: 'white',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
             fontSize: '15px',
             fontWeight: '600',
             fontFamily: 'Cairo, sans-serif',
-            transition: 'all 0.3s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: '#27ae60',
-            color: 'white'
+            transition: 'all 0.3s ease'
         },
         editSponsorBtn: {
             padding: '10px 24px',
+            backgroundColor: '#f39c12',
+            color: 'white',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
             fontSize: '15px',
             fontWeight: '600',
             fontFamily: 'Cairo, sans-serif',
-            transition: 'all 0.3s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: '#f39c12',
-            color: 'white'
+            transition: 'all 0.3s ease'
         },
         deleteSponsorBtn: {
             padding: '10px 24px',
+            backgroundColor: '#e74c3c',
+            color: 'white',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
             fontSize: '15px',
             fontWeight: '600',
             fontFamily: 'Cairo, sans-serif',
-            transition: 'all 0.3s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: '#e74c3c',
-            color: 'white'
+            transition: 'all 0.3s ease'
         },
         mainLayout: {
             display: 'flex',
@@ -284,10 +251,7 @@ const FamilyView = () => {
             fontSize: '18px',
             borderBottom: '2px solid #3498db',
             paddingBottom: '10px',
-            marginBottom: '15px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
+            marginBottom: '15px'
         },
         sponsorItem: {
             padding: '12px 16px',
@@ -308,11 +272,7 @@ const FamilyView = () => {
             alignItems: 'center',
             marginBottom: '4px'
         },
-        sponsorItemName: {
-            fontSize: '15px',
-            fontWeight: '700',
-            color: '#2c3e50'
-        },
+        sponsorItemName: { fontSize: '15px', fontWeight: '700', color: '#2c3e50' },
         sponsorItemId: {
             backgroundColor: '#3498db',
             color: 'white',
@@ -338,18 +298,9 @@ const FamilyView = () => {
             minHeight: '400px',
             minWidth: '300px'
         },
-        emptyState: {
-            textAlign: 'center',
-            padding: '80px 20px',
-            color: '#b0b8c4'
-        },
-        emptyStateH2: {
-            fontSize: '24px',
-            marginBottom: '10px'
-        },
-        emptyStateP: {
-            fontSize: '16px'
-        },
+        emptyState: { textAlign: 'center', padding: '80px 20px', color: '#b0b8c4' },
+        emptyStateH2: { fontSize: '24px', marginBottom: '10px' },
+        emptyStateP: { fontSize: '16px' },
         sponsorCard: {
             marginBottom: '20px',
             backgroundColor: '#f8f9fa',
@@ -363,12 +314,7 @@ const FamilyView = () => {
             flexWrap: 'wrap',
             marginBottom: '15px'
         },
-        sponsorName: {
-            fontSize: '22px',
-            fontWeight: '700',
-            color: '#2c3e50',
-            margin: 0
-        },
+        sponsorName: { fontSize: '22px', fontWeight: '700', color: '#2c3e50', margin: 0 },
         sponsorGrid: {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
@@ -381,15 +327,8 @@ const FamilyView = () => {
             border: '1px solid #e8ecf1',
             fontSize: '14px'
         },
-        sponsorGridLabel: {
-            color: '#7f8c8d',
-            fontSize: '12px',
-            display: 'block'
-        },
-        sponsorGridValue: {
-            fontWeight: '600',
-            color: '#2c3e50'
-        },
+        sponsorGridLabel: { color: '#7f8c8d', fontSize: '12px', display: 'block' },
+        sponsorGridValue: { fontWeight: '600', color: '#2c3e50' },
         statsContainer: {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
@@ -401,30 +340,16 @@ const FamilyView = () => {
             padding: '15px',
             borderRadius: '10px',
             textAlign: 'center',
-            border: '1px solid #e8ecf1',
-            transition: 'all 0.3s ease'
+            border: '1px solid #e8ecf1'
         },
-        statNumber: {
-            display: 'block',
-            fontSize: '28px',
-            fontWeight: '800',
-            color: '#2c3e50'
-        },
-        statLabel: {
-            fontSize: '13px',
-            color: '#7f8c8d'
-        },
-        tableSection: {
-            marginTop: '20px'
-        },
+        statNumber: { display: 'block', fontSize: '28px', fontWeight: '800', color: '#2c3e50' },
+        statLabel: { fontSize: '13px', color: '#7f8c8d' },
+        tableSection: { marginTop: '20px' },
         tableTitle: {
             fontSize: '18px',
             fontWeight: '700',
             color: '#2c3e50',
-            marginBottom: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
+            marginBottom: '12px'
         },
         tableWrapper: {
             overflowX: 'auto',
@@ -437,42 +362,23 @@ const FamilyView = () => {
             fontSize: '14px',
             minWidth: '700px'
         },
-        tableHead: {
-            backgroundColor: '#f0f4f8'
-        },
+        tableHead: { backgroundColor: '#f0f4f8' },
         tableHeadCell: {
             padding: '12px 16px',
             textAlign: 'right',
             fontWeight: '700',
             color: '#2c3e50',
-            borderBottom: '2px solid #dde3e9',
-            whiteSpace: 'nowrap'
+            borderBottom: '2px solid #dde3e9'
         },
-        tableRow: {
-            borderBottom: '1px solid #eef2f7',
-            transition: 'background 0.15s ease'
-        },
-        tableCell: {
-            padding: '10px 16px',
-            verticalAlign: 'middle',
-            color: '#2c3e50'
-        },
+        tableRow: { borderBottom: '1px solid #eef2f7' },
+        tableCell: { padding: '10px 16px', verticalAlign: 'middle', color: '#2c3e50' },
         relationshipBadge: {
             display: 'inline-block',
             padding: '4px 14px',
             borderRadius: '20px',
             color: 'white',
             fontSize: '13px',
-            fontWeight: '600',
-            whiteSpace: 'nowrap'
-        },
-        statusBadge: {
-            display: 'inline-block',
-            padding: '4px 12px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            fontWeight: '600',
-            whiteSpace: 'nowrap'
+            fontWeight: '600'
         },
         activeBadge: {
             display: 'inline-block',
@@ -480,7 +386,6 @@ const FamilyView = () => {
             borderRadius: '20px',
             fontSize: '12px',
             fontWeight: '600',
-            whiteSpace: 'nowrap',
             color: '#27ae60',
             backgroundColor: '#e8f5e9'
         },
@@ -490,23 +395,12 @@ const FamilyView = () => {
             borderRadius: '20px',
             fontSize: '12px',
             fontWeight: '600',
-            whiteSpace: 'nowrap',
             color: '#e74c3c',
             backgroundColor: '#fde8e8'
         },
-        warning: {
-            color: '#e67e22',
-            fontWeight: '700'
-        },
-        success: {
-            color: '#27ae60',
-            fontWeight: '700'
-        },
-        actionButtons: {
-            display: 'flex',
-            gap: '5px',
-            flexWrap: 'wrap'
-        },
+        warning: { color: '#e67e22', fontWeight: '700' },
+        success: { color: '#27ae60', fontWeight: '700' },
+        actionButtons: { display: 'flex', gap: '5px', flexWrap: 'wrap' },
         editButton: {
             padding: '4px 10px',
             backgroundColor: '#2196F3',
@@ -514,8 +408,7 @@ const FamilyView = () => {
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            fontSize: '13px',
-            transition: 'all 0.2s ease'
+            fontSize: '13px'
         },
         deleteButton: {
             padding: '4px 10px',
@@ -524,8 +417,7 @@ const FamilyView = () => {
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            fontSize: '13px',
-            transition: 'all 0.2s ease'
+            fontSize: '13px'
         },
         error: {
             backgroundColor: '#fde8e8',
@@ -536,21 +428,12 @@ const FamilyView = () => {
             textAlign: 'center',
             fontWeight: '600'
         },
-        loading: {
-            textAlign: 'center',
-            padding: '40px',
-            color: '#7f8c8d'
-        },
-        noData: {
-            textAlign: 'center',
-            padding: '40px',
-            color: '#b0b8c4',
-            fontSize: '16px'
-        }
+        loading: { textAlign: 'center', padding: '40px', color: '#7f8c8d' },
+        noData: { textAlign: 'center', padding: '40px', color: '#b0b8c4', fontSize: '16px' }
     };
 
     // =============================================
-    // التصيير (Render)
+    // ✅ التصيير (Render) - هنا!
     // =============================================
     return (
         <div style={styles.container}>
@@ -560,30 +443,18 @@ const FamilyView = () => {
             </header>
 
             <div style={styles.actions}>
-                <button 
-                    onClick={() => setShowAddSponsor(true)} 
-                    style={styles.addSponsorBtn}
-                >
+                <button onClick={() => setShowAddSponsor(true)} style={styles.addSponsorBtn}>
                     🏠 إضافة كافل
                 </button>
                 {selectedSponsor && (
                     <>
-                        <button 
-                            onClick={() => setShowAddDependent(true)} 
-                            style={styles.addDependentBtn}
-                        >
+                        <button onClick={() => setShowAddDependent(true)} style={styles.addDependentBtn}>
                             ➕ إضافة مكفول
                         </button>
-                        <button 
-                            onClick={() => setShowEditSponsor(true)} 
-                            style={styles.editSponsorBtn}
-                        >
+                        <button onClick={() => setShowEditSponsor(true)} style={styles.editSponsorBtn}>
                             ✏️ تعديل الكافل
                         </button>
-                        <button 
-                            onClick={handleDeleteSponsor} 
-                            style={styles.deleteSponsorBtn}
-                        >
+                        <button onClick={handleDeleteSponsor} style={styles.deleteSponsorBtn}>
                             🗑️ حذف الكافل
                         </button>
                     </>
@@ -593,7 +464,7 @@ const FamilyView = () => {
             {error && <div style={styles.error}>❌ {error}</div>}
 
             <div style={styles.mainLayout}>
-                {/* ========== قائمة الكافلين ========== */}
+                {/* قائمة الكافلين */}
                 <div style={styles.sponsorList}>
                     <h3 style={styles.sponsorListTitle}>👨‍👩‍👧‍👦 قائمة الكافلين</h3>
                     
@@ -609,16 +480,6 @@ const FamilyView = () => {
                             style={{
                                 ...styles.sponsorItem,
                                 ...(selectedSponsor?.id === sponsor.id ? styles.sponsorItemSelected : {})
-                            }}
-                            onMouseEnter={(e) => {
-                                if (selectedSponsor?.id !== sponsor.id) {
-                                    e.currentTarget.style.transform = 'translateX(-4px)';
-                                    e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.08)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateX(0)';
-                                e.currentTarget.style.boxShadow = 'none';
                             }}
                             onClick={() => handleSelectSponsor(sponsor.id)}
                         >
@@ -636,11 +497,10 @@ const FamilyView = () => {
                     ))}
                 </div>
 
-                {/* ========== لوحة التفاصيل ========== */}
+                {/* لوحة التفاصيل */}
                 <div style={styles.detailsPanel}>
                     {selectedSponsor ? (
                         <>
-                            {/* ===== بطاقة الكافل ===== */}
                             <div style={styles.sponsorCard}>
                                 <div style={styles.sponsorHeader}>
                                     <h2 style={styles.sponsorName}>👤 {selectedSponsor.full_name}</h2>
@@ -674,7 +534,6 @@ const FamilyView = () => {
                                 </div>
                             </div>
 
-                            {/* ===== الإحصائيات ===== */}
                             <div style={styles.statsContainer}>
                                 <div style={styles.statBox}>
                                     <span style={styles.statNumber}>{statistics.total}</span>
@@ -694,51 +553,34 @@ const FamilyView = () => {
                                 </div>
                             </div>
 
-                            {/* ===== جدول المكفولين ===== */}
                             <div style={styles.tableSection}>
                                 <h3 style={styles.tableTitle}>
-                                    👨‍👩‍👧‍👦 المكفولين
-                                    <span style={{ fontSize: '14px', color: '#7f8c8d', fontWeight: '400' }}>
-                                        ({dependents.length})
-                                    </span>
+                                    👨‍👩‍👧‍👦 المكفولين ({dependents.length})
                                 </h3>
                                 <div style={styles.tableWrapper}>
                                     <table style={styles.table}>
                                         <thead style={styles.tableHead}>
                                             <tr>
-                                                <th style={styles.tableHeadCell} width="50">#</th>
-                                                <th style={styles.tableHeadCell} align="right">الاسم</th>
-                                                <th style={styles.tableHeadCell} align="center">الصلة</th>
-                                                <th style={styles.tableHeadCell} align="center">تاريخ الميلاد</th>
-                                                <th style={styles.tableHeadCell} align="center">العمر</th>
-                                                <th style={styles.tableHeadCell} align="center">الحالة</th>
-                                                <th style={styles.tableHeadCell} align="center">الإجراءات</th>
+                                                <th style={styles.tableHeadCell}>#</th>
+                                                <th style={styles.tableHeadCell}>الاسم</th>
+                                                <th style={styles.tableHeadCell}>الصلة</th>
+                                                <th style={styles.tableHeadCell}>تاريخ الميلاد</th>
+                                                <th style={styles.tableHeadCell}>العمر</th>
+                                                <th style={styles.tableHeadCell}>الحالة</th>
+                                                <th style={styles.tableHeadCell}>الإجراءات</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {dependents.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan="7" style={styles.noData}>
-                                                        🕊️ لا يوجد مكفولين
-                                                    </td>
+                                                    <td colSpan="7" style={styles.noData}>🕊️ لا يوجد مكفولين</td>
                                                 </tr>
                                             ) : (
                                                 dependents.map((dep, index) => (
-                                                    <tr 
-                                                        key={dep.id} 
-                                                        style={styles.tableRow}
-                                                        onMouseEnter={(e) => {
-                                                            e.currentTarget.style.backgroundColor = '#f8f9fa';
-                                                        }}
-                                                        onMouseLeave={(e) => {
-                                                            e.currentTarget.style.backgroundColor = 'transparent';
-                                                        }}
-                                                    >
-                                                        <td style={styles.tableCell} align="center">{index + 1}</td>
+                                                    <tr key={dep.id} style={styles.tableRow}>
+                                                        <td style={styles.tableCell}>{index + 1}</td>
+                                                        <td style={styles.tableCell}><strong>{dep.full_name}</strong></td>
                                                         <td style={styles.tableCell}>
-                                                            <strong>{dep.full_name}</strong>
-                                                        </td>
-                                                        <td style={styles.tableCell} align="center">
                                                             <span style={{
                                                                 ...styles.relationshipBadge,
                                                                 backgroundColor: getRelationshipColor(dep.relationship)
@@ -746,29 +588,27 @@ const FamilyView = () => {
                                                                 {getRelationshipEmoji(dep.relationship)} {dep.relationship}
                                                             </span>
                                                         </td>
-                                                        <td style={styles.tableCell} align="center">{dep.date_of_birth}</td>
-                                                        <td style={styles.tableCell} align="center">{dep.age} سنة</td>
-                                                        <td style={styles.tableCell} align="center">
+                                                        <td style={styles.tableCell}>{dep.date_of_birth}</td>
+                                                        <td style={styles.tableCell}>{dep.age} سنة</td>
+                                                        <td style={styles.tableCell}>
                                                             <span style={dep.is_active ? styles.activeBadge : styles.inactiveBadge}>
                                                                 {dep.is_active ? '✅ نشط' : '❌ غير نشط'}
                                                             </span>
                                                         </td>
-                                                        <td style={styles.tableCell} align="center">
+                                                        <td style={styles.tableCell}>
                                                             <div style={styles.actionButtons}>
-                                                                <button 
+                                                                <button
                                                                     onClick={() => {
                                                                         setSelectedDependent(dep);
                                                                         setShowEditDependent(true);
                                                                     }}
                                                                     style={styles.editButton}
-                                                                    title="تعديل"
                                                                 >
                                                                     ✏️
                                                                 </button>
-                                                                <button 
+                                                                <button
                                                                     onClick={() => handleDeleteDependent(dep.id, dep.full_name)}
                                                                     style={styles.deleteButton}
-                                                                    title="حذف"
                                                                 >
                                                                     🗑️
                                                                 </button>
@@ -791,7 +631,7 @@ const FamilyView = () => {
                 </div>
             </div>
 
-            {/* ========== النماذج المنبثقة ========== */}
+            {/* النماذج المنبثقة */}
             {showAddSponsor && (
                 <SponsorFormModal
                     title="🏠 إضافة كافل جديد"
@@ -935,34 +775,17 @@ const SponsorFormModal = ({ title, onClose, onSuccess, mode, sponsorData }) => {
             marginBottom: '15px',
             textAlign: 'center'
         },
-        form: {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px'
-        },
-        group: {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '5px'
-        },
-        label: {
-            fontWeight: '600',
-            color: '#2c3e50',
-            fontSize: '14px'
-        },
+        form: { display: 'flex', flexDirection: 'column', gap: '14px' },
+        group: { display: 'flex', flexDirection: 'column', gap: '5px' },
+        label: { fontWeight: '600', color: '#2c3e50', fontSize: '14px' },
         input: {
             padding: '10px 14px',
             borderRadius: '8px',
             border: '2px solid #e0e0e0',
             fontSize: '15px',
-            fontFamily: 'Cairo, sans-serif',
-            transition: 'border 0.3s ease'
+            fontFamily: 'Cairo, sans-serif'
         },
-        buttons: {
-            display: 'flex',
-            gap: '10px',
-            marginTop: '10px'
-        },
+        buttons: { display: 'flex', gap: '10px', marginTop: '10px' },
         submit: {
             flex: 1,
             padding: '12px',
@@ -1137,12 +960,7 @@ const DependentFormModal = ({ title, onClose, onSuccess, sponsorId, mode, depend
             marginBottom: '15px',
             textAlign: 'center'
         },
-        hintText: {
-            color: '#2c3e50',
-            fontSize: '14px',
-            margin: 0,
-            fontFamily: 'Cairo, sans-serif'
-        },
+        hintText: { color: '#2c3e50', fontSize: '14px', margin: 0, fontFamily: 'Cairo, sans-serif' },
         error: {
             backgroundColor: '#fde8e8',
             color: '#e74c3c',
@@ -1151,28 +969,15 @@ const DependentFormModal = ({ title, onClose, onSuccess, sponsorId, mode, depend
             marginBottom: '15px',
             textAlign: 'center'
         },
-        form: {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px'
-        },
-        group: {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '5px'
-        },
-        label: {
-            fontWeight: '600',
-            color: '#2c3e50',
-            fontSize: '14px'
-        },
+        form: { display: 'flex', flexDirection: 'column', gap: '14px' },
+        group: { display: 'flex', flexDirection: 'column', gap: '5px' },
+        label: { fontWeight: '600', color: '#2c3e50', fontSize: '14px' },
         input: {
             padding: '10px 14px',
             borderRadius: '8px',
             border: '2px solid #e0e0e0',
             fontSize: '15px',
-            fontFamily: 'Cairo, sans-serif',
-            transition: 'border 0.3s ease'
+            fontFamily: 'Cairo, sans-serif'
         },
         select: {
             padding: '10px 14px',
@@ -1182,16 +987,8 @@ const DependentFormModal = ({ title, onClose, onSuccess, sponsorId, mode, depend
             fontFamily: 'Cairo, sans-serif',
             backgroundColor: 'white'
         },
-        hintSmall: {
-            color: '#7f8c8d',
-            fontSize: '12px',
-            marginTop: '3px'
-        },
-        buttons: {
-            display: 'flex',
-            gap: '10px',
-            marginTop: '10px'
-        },
+        hintSmall: { color: '#7f8c8d', fontSize: '12px', marginTop: '3px' },
+        buttons: { display: 'flex', gap: '10px', marginTop: '10px' },
         submit: {
             flex: 1,
             padding: '12px',
