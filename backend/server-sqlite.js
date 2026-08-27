@@ -15,9 +15,9 @@ const app = express();
 // =============================================
 const allowedOrigins = process.env.NODE_ENV === 'production'
     ? [
-        'https://your-frontend.vercel.app',    // 🔄 غيّر هذا بعد نشر الفرونتند
-        'https://your-frontend.netlify.app',   // 🔄 غيّر هذا بعد نشر الفرونتند
-        process.env.FRONTEND_URL               // أو استخدم متغير بيئة
+        'https://insurance-system-rho.vercel.app',
+        'https://insurance-system-f2onumb13-mutasimmos-projects.vercel.app',
+        'https://insurance-frontend.vercel.app'
       ].filter(Boolean)
     : ['http://localhost:3000', 'http://localhost:3001'];
 
