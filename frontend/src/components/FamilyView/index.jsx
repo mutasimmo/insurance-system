@@ -11,6 +11,7 @@ import DependentFormModal from './components/DependentFormModal';
 import './FamilyView.css';
 
 const FamilyView = () => {
+    // ✅ تم حذف: setStatistics, setLoading, setError
     const {
         sponsors,
         selectedSponsor,
@@ -21,10 +22,7 @@ const FamilyView = () => {
         fetchSponsors,
         fetchSponsorDetails,
         setSelectedSponsor,
-        setDependents,
-        setStatistics,
-        setLoading,
-        setError
+        setDependents
     } = useFamilyData();
 
     const [showAddSponsor, setShowAddSponsor] = useState(false);
