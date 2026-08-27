@@ -146,7 +146,7 @@ const FamilyView = () => {
     };
 
     // =============================================
-    // التنسيقات (Styles)
+    // تعريف الأنماط (styles) - ✅ يجب أن يكون هنا!
     // =============================================
     const styles = {
         container: {
@@ -202,22 +202,62 @@ const FamilyView = () => {
             gap: '8px'
         },
         addSponsorBtn: {
-            ...styles.btn,
+            padding: '10px 24px',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '15px',
+            fontWeight: '600',
+            fontFamily: 'Cairo, sans-serif',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
             backgroundColor: '#9b59b6',
             color: 'white'
         },
         addDependentBtn: {
-            ...styles.btn,
+            padding: '10px 24px',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '15px',
+            fontWeight: '600',
+            fontFamily: 'Cairo, sans-serif',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
             backgroundColor: '#27ae60',
             color: 'white'
         },
         editSponsorBtn: {
-            ...styles.btn,
+            padding: '10px 24px',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '15px',
+            fontWeight: '600',
+            fontFamily: 'Cairo, sans-serif',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
             backgroundColor: '#f39c12',
             color: 'white'
         },
         deleteSponsorBtn: {
-            ...styles.btn,
+            padding: '10px 24px',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '15px',
+            fontWeight: '600',
+            fontFamily: 'Cairo, sans-serif',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
             backgroundColor: '#e74c3c',
             color: 'white'
         },
@@ -257,10 +297,6 @@ const FamilyView = () => {
             transition: 'all 0.25s ease',
             border: '1px solid #e8ecf1',
             backgroundColor: 'white'
-        },
-        sponsorItemHover: {
-            transform: 'translateX(-4px)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.08)'
         },
         sponsorItemSelected: {
             backgroundColor: '#e3f2fd',
@@ -416,9 +452,6 @@ const FamilyView = () => {
             borderBottom: '1px solid #eef2f7',
             transition: 'background 0.15s ease'
         },
-        tableRowHover: {
-            backgroundColor: '#f8f9fa'
-        },
         tableCell: {
             padding: '10px 16px',
             verticalAlign: 'middle',
@@ -442,12 +475,22 @@ const FamilyView = () => {
             whiteSpace: 'nowrap'
         },
         activeBadge: {
-            ...styles.statusBadge,
+            display: 'inline-block',
+            padding: '4px 12px',
+            borderRadius: '20px',
+            fontSize: '12px',
+            fontWeight: '600',
+            whiteSpace: 'nowrap',
             color: '#27ae60',
             backgroundColor: '#e8f5e9'
         },
         inactiveBadge: {
-            ...styles.statusBadge,
+            display: 'inline-block',
+            padding: '4px 12px',
+            borderRadius: '20px',
+            fontSize: '12px',
+            fontWeight: '600',
+            whiteSpace: 'nowrap',
             color: '#e74c3c',
             backgroundColor: '#fde8e8'
         },
@@ -497,15 +540,6 @@ const FamilyView = () => {
             textAlign: 'center',
             padding: '40px',
             color: '#7f8c8d'
-        },
-        spinner: {
-            display: 'inline-block',
-            width: '40px',
-            height: '40px',
-            border: '4px solid #e8ecf1',
-            borderTop: '4px solid #3498db',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
         },
         noData: {
             textAlign: 'center',
