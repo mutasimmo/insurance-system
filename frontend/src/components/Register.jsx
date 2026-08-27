@@ -1,4 +1,6 @@
+// frontend/src/components/Register.jsx
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { authService } from '../services/api';
 
 const Register = () => {
@@ -19,14 +21,34 @@ const Register = () => {
         setError('');
         setSuccess('');
 
+        // التحقق من تطابق كلمة المرور
         if (formData.password !== formData.confirmPassword) {
             setError('كلمة المرور غير متطابقة');
+            toast.error('❌ كلمة المرور غير متطابقة');
             setLoading(false);
             return;
         }
 
+        // التحقق من طول كلمة المرور
         if (formData.password.length < 6) {
             setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+            toast.error('❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+            setLoading(false);
+            return;
+        }
+
+        // التحقق من اسم المستخدم
+        if (formData.username.length < 3) {
+            setError('اسم المستخدم يجب أن يكون 3 أحرف على الأقل');
+            toast.error('❌ اسم المستخدم يجب أن يكون 3 أحرف على الأقل');
+            setLoading(false);
+            return;
+        }
+
+        // التحقق من الاسم الكامل
+        if (formData.full_name.length < 3) {
+            setError('الاسم الكامل يجب أن يكون 3 أحرف على الأقل');
+            toast.error('❌ الاسم الكامل يجب أن يكون 3 أحرف على الأقل');
             setLoading(false);
             return;
         }
@@ -36,16 +58,33 @@ const Register = () => {
                 username: formData.username,
                 password: formData.password,
                 full_name: formData.full_name,
-                email: formData.email
+                email: formData.email || null
             });
+
             if (response.data.success) {
                 setSuccess(response.data.message);
+                toast.success('✅ تم إنشاء الحساب بنجاح!');
+                toast.success('👋 سيتم تحويلك إلى صفحة تسجيل الدخول');
+                
+                // تنظيف النموذج
+                setFormData({
+                    username: '',
+                    password: '',
+                    confirmPassword: '',
+                    full_name: '',
+                    email: ''
+                });
+
+                // الانتقال إلى صفحة تسجيل الدخول بعد 2 ثانية
                 setTimeout(() => {
                     window.location.href = '/login';
-                }, 2000);
+                }, 2500);
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'حدث خطأ');
+            const errorMessage = err.response?.data?.message || 'حدث خطأ في إنشاء الحساب';
+            setError(errorMessage);
+            toast.error(`❌ ${errorMessage}`);
+            console.error('❌ خطأ في التسجيل:', err);
         } finally {
             setLoading(false);
         }
@@ -69,7 +108,7 @@ const Register = () => {
                             type="text"
                             value={formData.full_name}
                             onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                            placeholder="أدخل الاسم الكامل"
+                            placeholder="أدخل الاسم الكامل (3 أحرف على الأقل)"
                             required
                             style={styles.input}
                         />
@@ -81,7 +120,7 @@ const Register = () => {
                             type="text"
                             value={formData.username}
                             onChange={(e) => setFormData({...formData, username: e.target.value})}
-                            placeholder="أدخل اسم المستخدم"
+                            placeholder="أدخل اسم المستخدم (3 أحرف على الأقل)"
                             required
                             style={styles.input}
                         />
@@ -179,7 +218,8 @@ const styles = {
         padding: '12px',
         borderRadius: '8px',
         marginBottom: '15px',
-        textAlign: 'center'
+        textAlign: 'center',
+        border: '1px solid #f5c6cb'
     },
     success: {
         backgroundColor: '#e8f5e9',
@@ -187,7 +227,8 @@ const styles = {
         padding: '12px',
         borderRadius: '8px',
         marginBottom: '15px',
-        textAlign: 'center'
+        textAlign: 'center',
+        border: '1px solid #c3e6cb'
     },
     form: {
         display: 'flex',
@@ -210,7 +251,8 @@ const styles = {
         border: '2px solid #e0e0e0',
         fontSize: '15px',
         transition: 'border 0.3s',
-        fontFamily: 'inherit'
+        fontFamily: 'Cairo, sans-serif',
+        direction: 'rtl'
     },
     button: {
         padding: '14px',
@@ -221,17 +263,19 @@ const styles = {
         fontSize: '18px',
         fontWeight: '600',
         cursor: 'pointer',
-        transition: 'background 0.3s',
+        transition: 'all 0.3s ease',
         fontFamily: 'Cairo, sans-serif'
     },
     buttonDisabled: {
         opacity: 0.7,
-        cursor: 'not-allowed'
+        cursor: 'not-allowed',
+        transform: 'none !important'
     },
     footer: {
         textAlign: 'center',
         marginTop: '18px',
-        color: '#7f8c8d'
+        color: '#7f8c8d',
+        fontSize: '14px'
     },
     link: {
         color: '#3498db',

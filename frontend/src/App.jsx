@@ -1,6 +1,7 @@
 // frontend/src/App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import FamilyView from './components/FamilyView';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
@@ -13,11 +14,9 @@ import './App.css';
 // =============================================
 const ProtectedRoute = ({ children, isLoggedIn }) => {
     const location = useLocation();
-    
     if (!isLoggedIn) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
-    
     return children;
 };
 
@@ -30,11 +29,7 @@ const AppContent = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const location = useLocation();
 
-    // =============================================
-    // التحقق من الجلسة عند التحميل
-    // =============================================
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -58,9 +53,6 @@ const AppContent = () => {
         }
     }, []);
 
-    // =============================================
-    // دوال المصادقة
-    // =============================================
     const handleLogin = (userData) => {
         setUser(userData);
         setIsLoggedIn(true);
@@ -75,9 +67,6 @@ const AppContent = () => {
         navigate('/login');
     };
 
-    // =============================================
-    // شاشة التحميل
-    // =============================================
     if (loading) {
         return (
             <div className="loading-screen">
@@ -87,9 +76,6 @@ const AppContent = () => {
         );
     }
 
-    // =============================================
-    // التنقل بين الصفحات
-    // =============================================
     const navigateTo = (page) => {
         setCurrentPage(page);
         if (page === 'dashboard') {
@@ -99,11 +85,37 @@ const AppContent = () => {
         }
     };
 
-    // =============================================
-    // الواجهة الرئيسية (بعد تسجيل الدخول)
-    // =============================================
     return (
         <div className="app">
+            {/* ✅ إضافة Toaster للإشعارات */}
+            <Toaster
+                position="top-center"
+                reverseOrder={false}
+                toastOptions={{
+                    duration: 3000,
+                    style: {
+                        background: '#363636',
+                        color: '#fff',
+                        fontFamily: 'Cairo, sans-serif',
+                        direction: 'rtl',
+                        borderRadius: '12px',
+                        padding: '16px 20px'
+                    },
+                    success: {
+                        style: {
+                            background: '#27ae60',
+                        },
+                        icon: '✅'
+                    },
+                    error: {
+                        style: {
+                            background: '#e74c3c',
+                        },
+                        icon: '❌'
+                    }
+                }}
+            />
+
             <nav className="navbar">
                 <div className="navbar-brand">
                     <span className="brand-icon">🏥</span>
@@ -133,34 +145,22 @@ const AppContent = () => {
 
             <main className="main-content">
                 <Routes>
-                    <Route 
-                        path="/" 
-                        element={
-                            <ProtectedRoute isLoggedIn={isLoggedIn}>
-                                <Dashboard />
-                            </ProtectedRoute>
-                        } 
-                    />
-                    <Route 
-                        path="/dashboard" 
-                        element={
-                            <ProtectedRoute isLoggedIn={isLoggedIn}>
-                                <Dashboard />
-                            </ProtectedRoute>
-                        } 
-                    />
-                    <Route 
-                        path="/family" 
-                        element={
-                            <ProtectedRoute isLoggedIn={isLoggedIn}>
-                                <FamilyView />
-                            </ProtectedRoute>
-                        } 
-                    />
-                    <Route 
-                        path="*" 
-                        element={<Navigate to="/" replace />} 
-                    />
+                    <Route path="/" element={
+                        <ProtectedRoute isLoggedIn={isLoggedIn}>
+                            <Dashboard />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/dashboard" element={
+                        <ProtectedRoute isLoggedIn={isLoggedIn}>
+                            <Dashboard />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/family" element={
+                        <ProtectedRoute isLoggedIn={isLoggedIn}>
+                            <FamilyView />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </main>
         </div>

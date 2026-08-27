@@ -1,4 +1,6 @@
+// frontend/src/services/api.js
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 // =============================================
 // تحديد عنوان API حسب البيئة
@@ -32,8 +34,14 @@ const api = axios.create({
 // =============================================
 export const tokenHelpers = {
     getToken: () => localStorage.getItem('token'),
-    setToken: (token) => localStorage.setItem('token', token),
-    removeToken: () => localStorage.removeItem('token'),
+    setToken: (token) => {
+        localStorage.setItem('token', token);
+        toast.success('✅ تم تسجيل الدخول بنجاح');
+    },
+    removeToken: () => {
+        localStorage.removeItem('token');
+        toast.info('👋 تم تسجيل الخروج');
+    },
     isAuthenticated: () => !!localStorage.getItem('token'),
     getUser: () => {
         try {
@@ -58,6 +66,7 @@ api.interceptors.request.use(
     },
     (error) => {
         console.error('❌ Request Error:', error.message);
+        toast.error('❌ خطأ في الطلب');
         return Promise.reject(error);
     }
 );
@@ -76,27 +85,52 @@ api.interceptors.response.use(
     async (error) => {
         const config = error.config;
         
-        // تحسين رسائل الخطأ
+        // تحسين رسائل الخطأ مع Toast
         if (error.code === 'ECONNABORTED') {
             console.error('⏰ انتهت المهلة - الخادم لا يستجيب');
+            toast.error('⏰ انتهت المهلة. الخادم لا يستجيب');
         } else if (error.response) {
-            console.error(`❌ خطأ ${error.response.status}:`, error.response.data?.message || error.message);
+            const status = error.response.status;
+            const message = error.response.data?.message || error.message;
+            console.error(`❌ خطأ ${status}:`, message);
+            
+            // رسائل مخصصة حسب رمز الخطأ
+            if (status === 400) {
+                toast.error(`❌ ${message || 'بيانات غير صحيحة'}`);
+            } else if (status === 401) {
+                toast.error('❌ جلسة منتهية. الرجاء تسجيل الدخول مجدداً');
+            } else if (status === 403) {
+                toast.error('❌ غير مصرح لك بهذه العملية');
+            } else if (status === 404) {
+                toast.error('❌ لم يتم العثور على المورد');
+            } else if (status >= 500) {
+                toast.error('❌ خطأ في الخادم. حاول مرة أخرى');
+            }
         } else if (error.request) {
             console.error('❌ لا يوجد رد من الخادم - تحقق من الاتصال');
+            toast.error('❌ لا يوجد اتصال بالخادم');
         } else {
             console.error('❌ خطأ في الطلب:', error.message);
+            toast.error(`❌ ${error.message || 'حدث خطأ غير متوقع'}`);
         }
 
         // معالجة 401 (انتهاء الجلسة)
         if (error.response?.status === 401) {
             tokenHelpers.removeToken();
             localStorage.removeItem('user');
-            window.location.href = '/login';
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1500);
             return Promise.reject(error);
         }
 
-        // إعادة المحاولة للطلبات الفاشلة (باستثناء 401)
+        // إعادة المحاولة للطلبات الفاشلة (باستثناء 401 و 400 و 403)
         if (!config || config._retryCount >= MAX_RETRIES) {
+            return Promise.reject(error);
+        }
+        
+        // لا تعيد المحاولة لبعض الأخطاء
+        if (error.response?.status === 400 || error.response?.status === 403) {
             return Promise.reject(error);
         }
         
@@ -104,6 +138,7 @@ api.interceptors.response.use(
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * config._retryCount));
         
         console.log(`🔄 إعادة المحاولة ${config._retryCount}/${MAX_RETRIES}:`, config.url);
+        toast.loading(`⏳ جاري إعادة المحاولة ${config._retryCount}/${MAX_RETRIES}...`);
         return api(config);
     }
 );
@@ -112,13 +147,28 @@ api.interceptors.response.use(
 // خدمات المصادقة (Auth)
 // =============================================
 export const authService = {
-    login: (username, password) => api.post('/auth/login', { username, password }),
+    login: async (username, password) => {
+        try {
+            const response = await api.post('/auth/login', { username, password });
+            if (response.data.success) {
+                tokenHelpers.setToken(response.data.token);
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+                toast.success(`👋 مرحباً ${response.data.user.full_name}`);
+            }
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    },
     register: (data) => api.post('/auth/register', data),
     verify: () => api.get('/auth/verify'),
     logout: () => {
         tokenHelpers.removeToken();
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        toast.success('👋 تم تسجيل الخروج بنجاح');
+        setTimeout(() => {
+            window.location.href = '/login';
+        }, 500);
     }
 };
 
