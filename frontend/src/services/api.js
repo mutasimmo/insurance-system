@@ -6,8 +6,8 @@ import axios from 'axios';
 const getApiBase = () => {
     // في بيئة الإنتاج (Vercel)
     if (process.env.NODE_ENV === 'production') {
-        // استبدل هذا بالرابط الفعلي لـ Render بعد النشر
-        return 'https://insurance-backend.onrender.com/api';
+        // ✅ استخدم الرابط الفعلي لـ Render
+        return 'https://insurance-system-9hzb.onrender.com/api';
     }
     // في بيئة التطوير المحلية
     return 'http://localhost:5000/api';
