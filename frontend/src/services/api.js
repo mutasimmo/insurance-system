@@ -1,19 +1,12 @@
 import axios from 'axios';
 
 // =============================================
-// تحديد عنوان API حسب البيئة
+// تحديد عنوان API (ثابت مباشر)
 // =============================================
-const getApiBase = () => {
-    // في بيئة الإنتاج (Vercel)
-    if (process.env.NODE_ENV === 'production') {
-        // ✅ استخدم الرابط الفعلي لـ Render
-        return 'https://insurance-system-9hzb.onrender.com/api';
-    }
-    // في بيئة التطوير المحلية
-    return 'http://localhost:5000/api';
-};
+// ✅ استخدام الرابط الثابت مباشرة
+const API_BASE = 'https://insurance-system-9hzb.onrender.com/api';
 
-const API_BASE = getApiBase();
+console.log('🔗 API Base URL:', API_BASE);
 
 const api = axios.create({
     baseURL: API_BASE,
@@ -29,6 +22,7 @@ api.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        console.log('📤 Request:', config.method.toUpperCase(), config.url);
         return config;
     },
     (error) => Promise.reject(error)
@@ -36,8 +30,12 @@ api.interceptors.request.use(
 
 // التعامل مع أخطاء المصادقة
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        console.log('📥 Response:', response.status, response.config.url);
+        return response;
+    },
     (error) => {
+        console.error('❌ API Error:', error.message);
         if (error.response?.status === 401) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
