@@ -16,6 +16,13 @@ const FamilyView = () => {
     const [selectedDependent, setSelectedDependent] = useState(null);
 
     // =============================================
+    // State للبحث
+    // =============================================
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [showSearchResults, setShowSearchResults] = useState(false);
+
+    // =============================================
     // دوال مساعدة
     // =============================================
     const calculateAge = (birthDate) => {
@@ -97,6 +104,7 @@ const FamilyView = () => {
 
     const handleSelectSponsor = (id) => {
         fetchSponsorDetails(id);
+        clearSearch();
     };
 
     // =============================================
@@ -143,6 +151,56 @@ const FamilyView = () => {
                 console.error('❌ خطأ في حذف المكفول:', err);
             }
         }
+    };
+
+    // =============================================
+    // دوال البحث
+    // =============================================
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        
+        if (!term.trim()) {
+            setSearchResults([]);
+            setShowSearchResults(false);
+            return;
+        }
+
+        const results = [];
+        const lowerTerm = term.toLowerCase().trim();
+
+        // البحث في الكافلين
+        sponsors.forEach(sponsor => {
+            if (sponsor.full_name.toLowerCase().includes(lowerTerm)) {
+                results.push({
+                    ...sponsor,
+                    type: 'كافل',
+                    match: sponsor.full_name
+                });
+            }
+        });
+
+        // البحث في المكفولين (إذا كان هناك كافل محدد)
+        if (selectedSponsor) {
+            dependents.forEach(dependent => {
+                if (dependent.full_name.toLowerCase().includes(lowerTerm)) {
+                    results.push({
+                        ...dependent,
+                        type: 'مكفول',
+                        match: dependent.full_name,
+                        sponsor_name: selectedSponsor.full_name
+                    });
+                }
+            });
+        }
+
+        setSearchResults(results);
+        setShowSearchResults(true);
+    };
+
+    const clearSearch = () => {
+        setSearchTerm('');
+        setSearchResults([]);
+        setShowSearchResults(false);
     };
 
     // =============================================
@@ -235,7 +293,7 @@ const FamilyView = () => {
             flexWrap: 'wrap'
         },
         sponsorList: {
-            width: '320px',
+            width: '340px',
             minWidth: '250px',
             backgroundColor: 'white',
             borderRadius: '15px',
@@ -429,7 +487,100 @@ const FamilyView = () => {
             fontWeight: '600'
         },
         loading: { textAlign: 'center', padding: '40px', color: '#7f8c8d' },
-        noData: { textAlign: 'center', padding: '40px', color: '#b0b8c4', fontSize: '16px' }
+        noData: { textAlign: 'center', padding: '40px', color: '#b0b8c4', fontSize: '16px' },
+
+        // =============================================
+        // أنماط البحث
+        // =============================================
+        searchContainer: {
+            position: 'relative',
+            marginBottom: '15px'
+        },
+        searchBox: {
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: 'white',
+            borderRadius: '10px',
+            border: '2px solid #e8ecf1',
+            padding: '8px 14px',
+            transition: 'border 0.3s ease'
+        },
+        searchIcon: {
+            fontSize: '18px',
+            color: '#95a5a6',
+            marginLeft: '10px'
+        },
+        searchInput: {
+            flex: 1,
+            border: 'none',
+            outline: 'none',
+            fontSize: '15px',
+            fontFamily: 'Cairo, sans-serif',
+            padding: '8px 0',
+            backgroundColor: 'transparent',
+            color: '#2c3e50'
+        },
+        clearSearchBtn: {
+            background: 'none',
+            border: 'none',
+            color: '#95a5a6',
+            cursor: 'pointer',
+            fontSize: '16px',
+            padding: '4px 8px',
+            borderRadius: '50%',
+            transition: 'all 0.3s ease'
+        },
+        searchResults: {
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            backgroundColor: 'white',
+            borderRadius: '10px',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+            border: '1px solid #e8ecf1',
+            maxHeight: '300px',
+            overflowY: 'auto',
+            zIndex: 100,
+            marginTop: '5px'
+        },
+        searchResultItem: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '12px 16px',
+            borderBottom: '1px solid #f0f0f0',
+            cursor: 'pointer',
+            transition: 'background 0.2s ease'
+        },
+        resultType: {
+            fontSize: '18px'
+        },
+        resultName: {
+            flex: 1,
+            fontWeight: '600',
+            color: '#2c3e50'
+        },
+        resultTypeBadge: {
+            fontSize: '12px',
+            padding: '2px 10px',
+            borderRadius: '12px',
+            backgroundColor: '#e8ecf1',
+            color: '#7f8c8d'
+        },
+        resultSponsor: {
+            fontSize: '13px',
+            color: '#3498db'
+        },
+        noResults: {
+            textAlign: 'center',
+            padding: '20px',
+            color: '#95a5a6',
+            backgroundColor: 'white',
+            borderRadius: '10px',
+            border: '1px solid #e8ecf1',
+            marginTop: '5px'
+        }
     };
 
     // =============================================
@@ -464,9 +615,73 @@ const FamilyView = () => {
             {error && <div style={styles.error}>❌ {error}</div>}
 
             <div style={styles.mainLayout}>
-                {/* قائمة الكافلين */}
+                {/* ========== قائمة الكافلين مع البحث ========== */}
                 <div style={styles.sponsorList}>
                     <h3 style={styles.sponsorListTitle}>👨‍👩‍👧‍👦 قائمة الكافلين</h3>
+                    
+                    {/* شريط البحث */}
+                    <div style={styles.searchContainer}>
+                        <div style={styles.searchBox}>
+                            <span style={styles.searchIcon}>🔍</span>
+                            <input
+                                type="text"
+                                placeholder="ابحث عن كافل أو مكفول..."
+                                value={searchTerm}
+                                onChange={(e) => handleSearch(e.target.value)}
+                                style={styles.searchInput}
+                            />
+                            {searchTerm && (
+                                <button onClick={clearSearch} style={styles.clearSearchBtn}>
+                                    ✕
+                                </button>
+                            )}
+                        </div>
+                        
+                        {showSearchResults && searchResults.length > 0 && (
+                            <div style={styles.searchResults}>
+                                {searchResults.map((result, index) => (
+                                    <div 
+                                        key={index} 
+                                        style={styles.searchResultItem}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#f0f7ff';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                        }}
+                                        onClick={() => {
+                                            if (result.type === 'كافل') {
+                                                handleSelectSponsor(result.id);
+                                                clearSearch();
+                                            }
+                                        }}
+                                    >
+                                        <span style={styles.resultType}>
+                                            {result.type === 'كافل' ? '👤' : '👶'}
+                                        </span>
+                                        <span style={styles.resultName}>{result.match}</span>
+                                        <span style={styles.resultTypeBadge}>
+                                            {result.type}
+                                        </span>
+                                        {result.type === 'مكفول' && (
+                                            <span style={styles.resultSponsor}>
+                                                ← {result.sponsor_name}
+                                            </span>
+                                        )}
+                                        <span style={result.is_active ? styles.activeBadge : styles.inactiveBadge}>
+                                            {result.is_active ? '✅ نشط' : '❌ غير نشط'}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {showSearchResults && searchTerm && searchResults.length === 0 && (
+                            <div style={styles.noResults}>
+                                🕊️ لا توجد نتائج مطابقة لـ "{searchTerm}"
+                            </div>
+                        )}
+                    </div>
                     
                     {loading && <div style={styles.loading}>⏳ جاري التحميل...</div>}
                     
@@ -480,6 +695,16 @@ const FamilyView = () => {
                             style={{
                                 ...styles.sponsorItem,
                                 ...(selectedSponsor?.id === sponsor.id ? styles.sponsorItemSelected : {})
+                            }}
+                            onMouseEnter={(e) => {
+                                if (selectedSponsor?.id !== sponsor.id) {
+                                    e.currentTarget.style.transform = 'translateX(-4px)';
+                                    e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.08)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateX(0)';
+                                e.currentTarget.style.boxShadow = 'none';
                             }}
                             onClick={() => handleSelectSponsor(sponsor.id)}
                         >
@@ -497,7 +722,7 @@ const FamilyView = () => {
                     ))}
                 </div>
 
-                {/* لوحة التفاصيل */}
+                {/* ========== لوحة التفاصيل ========== */}
                 <div style={styles.detailsPanel}>
                     {selectedSponsor ? (
                         <>
@@ -603,12 +828,14 @@ const FamilyView = () => {
                                                                         setShowEditDependent(true);
                                                                     }}
                                                                     style={styles.editButton}
+                                                                    title="تعديل"
                                                                 >
                                                                     ✏️
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDeleteDependent(dep.id, dep.full_name)}
                                                                     style={styles.deleteButton}
+                                                                    title="حذف"
                                                                 >
                                                                     🗑️
                                                                 </button>
@@ -631,7 +858,7 @@ const FamilyView = () => {
                 </div>
             </div>
 
-            {/* النماذج المنبثقة */}
+            {/* ========== النماذج المنبثقة ========== */}
             {showAddSponsor && (
                 <SponsorFormModal
                     title="🏠 إضافة كافل جديد"
