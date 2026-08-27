@@ -1,5 +1,5 @@
 // frontend/src/components/FamilyView/index.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import api from '../../services/api';
 import useFamilyData from './hooks/useFamilyData';
 import SponsorList from './components/SponsorList';
@@ -206,5 +206,4 @@ const FamilyView = () => {
     );
 };
 
-export default FamilyView;/ /   =ØÝ  F o r c e   r e b u i l d   -   0 8 / 2 7 / 2 0 2 6   2 2 : 3 2 : 5 5  
- 
+export default FamilyView;
