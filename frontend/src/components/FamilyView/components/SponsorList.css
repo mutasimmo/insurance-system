@@ -1,0 +1,141 @@
+/* frontend/src/components/FamilyView/components/SponsorList.css */
+
+.sponsor-list {
+    width: 340px;
+    min-width: 250px;
+    background-color: white;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    max-height: 650px;
+    overflow-y: auto;
+    border: 1px solid #e8ecf1;
+    flex: 0 0 auto;
+}
+
+.sponsor-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sponsor-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.sponsor-list::-webkit-scrollbar-thumb {
+    background: #c1c7cd;
+    border-radius: 10px;
+}
+
+.sponsor-list::-webkit-scrollbar-thumb:hover {
+    background: #a0a7ae;
+}
+
+.sponsor-list-title {
+    color: #2c3e50;
+    font-size: 18px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px;
+    color: #b0b8c4;
+    font-size: 16px;
+}
+
+.no-results {
+    text-align: center;
+    padding: 20px;
+    color: #95a5a6;
+    background-color: white;
+    border-radius: 10px;
+    border: 1px solid #e8ecf1;
+    margin-top: 5px;
+}
+
+/* =============================================
+   عناصر الكافلين
+   ============================================= */
+.sponsor-item {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: 1px solid #e8ecf1;
+    background-color: white;
+}
+
+.sponsor-item:hover {
+    transform: translateX(-4px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.sponsor-item.selected {
+    background-color: #e3f2fd;
+    border-color: #2196F3;
+}
+
+.sponsor-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.sponsor-item-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.sponsor-item-id {
+    background-color: #3498db;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.sponsor-item-details {
+    display: flex;
+    gap: 12px;
+    font-size: 13px;
+    color: #7f8c8d;
+    flex-wrap: wrap;
+}
+
+.badge-active {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #27ae60;
+    background-color: #e8f5e9;
+}
+
+.badge-inactive {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #e74c3c;
+    background-color: #fde8e8;
+}
+
+/* =============================================
+   تصميم متجاوب
+   ============================================= */
+@media (max-width: 768px) {
+    .sponsor-list {
+        width: 100%;
+        min-width: auto;
+        max-height: 300px;
+    }
+}

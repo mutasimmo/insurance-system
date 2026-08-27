@@ -1,0 +1,57 @@
+/* frontend/src/components/FamilyView/components/SearchBar.css */
+
+.search-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 10px;
+    border: 2px solid #e8ecf1;
+    padding: 8px 14px;
+    transition: border 0.3s ease;
+}
+
+.search-box:focus-within {
+    border-color: #3498db;
+}
+
+.search-icon {
+    font-size: 18px;
+    color: #95a5a6;
+    margin-left: 10px;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    font-family: 'Cairo', sans-serif;
+    padding: 8px 0;
+    background-color: transparent;
+    color: #2c3e50;
+}
+
+.search-input::placeholder {
+    color: #b0b8c4;
+}
+
+.clear-search-btn {
+    background: none;
+    border: none;
+    color: #95a5a6;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.clear-search-btn:hover {
+    background-color: #f0f0f0;
+    color: #e74c3c;
+}

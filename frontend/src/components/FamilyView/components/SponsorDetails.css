@@ -1,0 +1,72 @@
+/* frontend/src/components/FamilyView/components/SponsorDetails.css */
+
+.sponsor-card {
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.sponsor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.sponsor-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.sponsor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.sponsor-grid-item {
+    background-color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #e8ecf1;
+    font-size: 14px;
+}
+
+.sponsor-grid-label {
+    color: #7f8c8d;
+    font-size: 12px;
+    display: block;
+}
+
+.sponsor-grid-value {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.text-warning {
+    color: #e67e22;
+    font-weight: 700;
+}
+
+.text-success {
+    color: #27ae60;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .sponsor-card {
+        padding: 15px;
+    }
+
+    .sponsor-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .sponsor-name {
+        font-size: 18px;
+    }
+}
