@@ -1,0 +1,217 @@
+/* =============================================
+   إعدادات عامة
+   ============================================= */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cairo', 'Tahoma', Arial, sans-serif;
+    background: #f0f2f5;
+    direction: rtl;
+    min-height: 100vh;
+}
+
+.app {
+    min-height: 100vh;
+}
+
+/* =============================================
+   شاشة التحميل
+   ============================================= */
+.loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.loader {
+    width: 60px;
+    height: 60px;
+    border: 5px solid #ecf0f1;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* =============================================
+   شريط التنقل (Navbar)
+   ============================================= */
+.navbar {
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    padding: 12px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    font-size: 28px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.brand-text {
+    color: white;
+    font-size: 22px;
+    font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.navbar-center {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    padding: 8px 22px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-family: 'Cairo', sans-serif;
+}
+
+.nav-btn:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+
+.nav-btn.active {
+    background: white;
+    color: #2c3e50;
+    border-color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.user-name {
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.logout-btn {
+    padding: 8px 20px;
+    background: rgba(231, 76, 60, 0.8);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-family: 'Cairo', sans-serif;
+}
+
+.logout-btn:hover {
+    background: #e74c3c;
+    transform: translateY(-2px);
+}
+
+/* =============================================
+   المحتوى الرئيسي
+   ============================================= */
+.main-content {
+    padding: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* =============================================
+   تصميم متجاوب
+   ============================================= */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px;
+    }
+
+    .navbar-brand {
+        justify-content: center;
+    }
+
+    .navbar-center {
+        justify-content: center;
+    }
+
+    .navbar-right {
+        justify-content: center;
+    }
+
+    .nav-btn {
+        padding: 6px 14px;
+        font-size: 13px;
+    }
+
+    .brand-text {
+        font-size: 18px;
+    }
+
+    .user-name {
+        font-size: 13px;
+    }
+}
+
+/* =============================================
+   تنسيق شريط التمرير
+   ============================================= */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c5c5c5;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
