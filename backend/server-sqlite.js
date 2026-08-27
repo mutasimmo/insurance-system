@@ -9,19 +9,98 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
-    credentials: true
-}));
-app.use(express.json());
 
 // =============================================
-// اتصال SQLite
+// ✅ CORS المحسن للنشر
+// =============================================
+const allowedOrigins = process.env.NODE_ENV === 'production'
+    ? [
+        'https://your-frontend.vercel.app',    // 🔄 غيّر هذا بعد نشر الفرونتند
+        'https://your-frontend.netlify.app',   // 🔄 غيّر هذا بعد نشر الفرونتند
+        process.env.FRONTEND_URL               // أو استخدم متغير بيئة
+      ].filter(Boolean)
+    : ['http://localhost:3000', 'http://localhost:3001'];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // السماح للطلبات بدون origin (مثل Postman)
+        if (!origin) return callback(null, true);
+        
+        if (process.env.NODE_ENV === 'production') {
+            // في الإنتاج: تحقق من القائمة المسموحة
+            if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('onrender.com')) {
+                callback(null, true);
+            } else {
+                callback(new Error('❌ غير مسموح بهذا النطاق'));
+            }
+        } else {
+            // في التطوير: السماح للجميع
+            callback(null, true);
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// =============================================
+// 📊 مسار الصحة لـ Render
+// =============================================
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        message: '🚀 نظام التأمين الطبي - الخادم يعمل بنجاح',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+// =============================================
+// 🏠 الصفحة الرئيسية
+// =============================================
+app.get('/', (req, res) => {
+    res.json({
+        message: '🚀 نظام التأمين الطبي - API',
+        version: '1.0.0',
+        status: '✅ يعمل بنجاح',
+        endpoints: {
+            auth: {
+                login: 'POST /api/auth/login',
+                register: 'POST /api/auth/register',
+                verify: 'GET /api/auth/verify'
+            },
+            sponsors: {
+                list: 'GET /api/sponsors',
+                get: 'GET /api/sponsors/:id',
+                create: 'POST /api/sponsors',
+                update: 'PUT /api/sponsors/:id',
+                delete: 'DELETE /api/sponsors/:id'
+            },
+            dependents: {
+                create: 'POST /api/dependents',
+                update: 'PUT /api/dependents/:id',
+                delete: 'DELETE /api/dependents/:id'
+            },
+            dashboard: 'GET /api/dashboard',
+            health: 'GET /health'
+        },
+        documentation: 'https://github.com/your-username/medical-insurance',
+        timestamp: new Date().toISOString()
+    });
+});
+
+// =============================================
+// 🗄️ اتصال SQLite
 // =============================================
 const dbPath = path.join(__dirname, 'insurance.db');
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('❌ فشل الاتصال بقاعدة البيانات:', err.message);
+        process.exit(1);
     } else {
         console.log('✅ تم الاتصال بقاعدة البيانات SQLite بنجاح');
         createTables();
@@ -29,9 +108,12 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 // =============================================
-// إنشاء الجداول (مع جدول المستخدمين)
+// 📋 إنشاء الجداول
 // =============================================
 function createTables() {
+    // تفعيل المفاتيح الأجنبية
+    db.run('PRAGMA foreign_keys = ON;');
+
     // جدول المستخدمين
     db.run(`
         CREATE TABLE IF NOT EXISTS users (
@@ -43,7 +125,13 @@ function createTables() {
             is_admin INTEGER DEFAULT 0,
             created_at TEXT DEFAULT (datetime('now'))
         )
-    `);
+    `, (err) => {
+        if (err) {
+            console.error('❌ خطأ في إنشاء جدول users:', err.message);
+        } else {
+            console.log('✅ جدول users جاهز');
+        }
+    });
 
     // جدول الكافلين
     db.run(`
@@ -58,7 +146,13 @@ function createTables() {
             created_at TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )
-    `);
+    `, (err) => {
+        if (err) {
+            console.error('❌ خطأ في إنشاء جدول sponsors:', err.message);
+        } else {
+            console.log('✅ جدول sponsors جاهز');
+        }
+    });
 
     // جدول المكفولين
     db.run(`
@@ -74,14 +168,16 @@ function createTables() {
         )
     `, (err) => {
         if (!err) {
-            console.log('✅ تم إنشاء الجداول بنجاح');
+            console.log('✅ تم إنشاء جميع الجداول بنجاح');
             createDefaultAdmin();
+        } else {
+            console.error('❌ خطأ في إنشاء جدول dependents:', err.message);
         }
     });
 }
 
 // =============================================
-// إنشاء مستخدم مدير افتراضي
+// 👤 إنشاء مستخدم مدير افتراضي
 // =============================================
 async function createDefaultAdmin() {
     db.get("SELECT COUNT(*) as count FROM users", (err, row) => {
@@ -96,9 +192,11 @@ async function createDefaultAdmin() {
                 VALUES (?, ?, ?, ?)
             `, ['admin', hashedPassword, 'المدير', 1], (err) => {
                 if (!err) {
+                    console.log('✅ ========================================');
                     console.log('✅ تم إنشاء مستخدم المدير الافتراضي');
                     console.log('📝 اسم المستخدم: admin');
                     console.log('📝 كلمة المرور: admin123');
+                    console.log('✅ ========================================');
                 }
             });
         }
@@ -106,7 +204,7 @@ async function createDefaultAdmin() {
 }
 
 // =============================================
-// دالة حساب العمر
+// 🛠️ دوال مساعدة
 // =============================================
 function calculateAge(birthDate) {
     if (!birthDate) return 0;
@@ -120,9 +218,6 @@ function calculateAge(birthDate) {
     return age < 0 ? 0 : age;
 }
 
-// =============================================
-// دالة حساب تاريخ الانتهاء
-// =============================================
 function calculateEndDate(startDate) {
     const date = new Date(startDate);
     date.setFullYear(date.getFullYear() + 1);
@@ -130,9 +225,6 @@ function calculateEndDate(startDate) {
     return date.toISOString().split('T')[0];
 }
 
-// =============================================
-// دالة استخراج الاسم الأول
-// =============================================
 function getFirstName(fullName) {
     if (!fullName) return '';
     const parts = fullName.trim().split(' ');
@@ -140,7 +232,7 @@ function getFirstName(fullName) {
 }
 
 // =============================================
-// Middleware: التحقق من التوكن
+// 🔐 Middleware: التحقق من التوكن
 // =============================================
 const authenticate = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -168,7 +260,7 @@ const authenticate = (req, res, next) => {
 };
 
 // =============================================
-// API: تسجيل الدخول
+// 📌 API: تسجيل الدخول
 // =============================================
 app.post('/api/auth/login', (req, res) => {
     const { username, password } = req.body;
@@ -197,7 +289,6 @@ app.post('/api/auth/login', (req, res) => {
                 });
             }
 
-            // التحقق من كلمة المرور
             const isValidPassword = bcrypt.compareSync(password, user.password);
             if (!isValidPassword) {
                 return res.status(401).json({
@@ -206,7 +297,6 @@ app.post('/api/auth/login', (req, res) => {
                 });
             }
 
-            // إنشاء توكن
             const token = jwt.sign(
                 {
                     id: user.id,
@@ -233,7 +323,7 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 // =============================================
-// API: تسجيل حساب جديد
+// 📌 API: تسجيل حساب جديد
 // =============================================
 app.post('/api/auth/register', (req, res) => {
     const { username, password, full_name, email } = req.body;
@@ -252,7 +342,6 @@ app.post('/api/auth/register', (req, res) => {
         });
     }
 
-    // التحقق من عدم وجود المستخدم
     db.get(
         'SELECT id FROM users WHERE username = ?',
         [username],
@@ -270,7 +359,6 @@ app.post('/api/auth/register', (req, res) => {
                 });
             }
 
-            // تشفير كلمة المرور
             const hashedPassword = bcrypt.hashSync(password, 10);
 
             db.run(`
@@ -295,7 +383,7 @@ app.post('/api/auth/register', (req, res) => {
 });
 
 // =============================================
-// API: التحقق من صلاحية التوكن
+// 📌 API: التحقق من صلاحية التوكن
 // =============================================
 app.get('/api/auth/verify', authenticate, (req, res) => {
     db.get(
@@ -322,7 +410,7 @@ app.get('/api/auth/verify', authenticate, (req, res) => {
 });
 
 // =============================================
-// API: جلب جميع الكافلين (خاص بالمستخدم)
+// 📌 API: جلب جميع الكافلين
 // =============================================
 app.get('/api/sponsors', authenticate, (req, res) => {
     db.all(
@@ -355,7 +443,7 @@ app.get('/api/sponsors', authenticate, (req, res) => {
 });
 
 // =============================================
-// API: جلب كافل واحد مع مكفوليه
+// 📌 API: جلب كافل واحد مع مكفوليه
 // =============================================
 app.get('/api/sponsors/:id', authenticate, (req, res) => {
     const { id } = req.params;
@@ -405,7 +493,7 @@ app.get('/api/sponsors/:id', authenticate, (req, res) => {
 });
 
 // =============================================
-// API: إضافة كافل جديد
+// 📌 API: إضافة كافل جديد
 // =============================================
 app.post('/api/sponsors', authenticate, (req, res) => {
     const { full_name, date_of_birth, subscription_start } = req.body;
@@ -454,7 +542,7 @@ app.post('/api/sponsors', authenticate, (req, res) => {
 });
 
 // =============================================
-// API: تحديث كافل
+// 📌 API: تحديث كافل
 // =============================================
 app.put('/api/sponsors/:id', authenticate, (req, res) => {
     const { id } = req.params;
@@ -535,7 +623,7 @@ app.put('/api/sponsors/:id', authenticate, (req, res) => {
 });
 
 // =============================================
-// API: حذف كافل
+// 📌 API: حذف كافل
 // =============================================
 app.delete('/api/sponsors/:id', authenticate, (req, res) => {
     const { id } = req.params;
@@ -572,7 +660,7 @@ app.delete('/api/sponsors/:id', authenticate, (req, res) => {
 });
 
 // =============================================
-// API: إضافة مكفول
+// 📌 API: إضافة مكفول
 // =============================================
 app.post('/api/dependents', authenticate, (req, res) => {
     const { sponsor_id, full_name, date_of_birth, relationship } = req.body;
@@ -585,7 +673,6 @@ app.post('/api/dependents', authenticate, (req, res) => {
         });
     }
 
-    // التحقق من ملكية الكافل
     db.get(
         'SELECT id, full_name as sponsor_name FROM sponsors WHERE id = ? AND user_id = ? AND is_active = 1',
         [sponsor_id, req.userId],
@@ -651,13 +738,12 @@ app.post('/api/dependents', authenticate, (req, res) => {
 });
 
 // =============================================
-// API: تحديث مكفول
+// 📌 API: تحديث مكفول
 // =============================================
 app.put('/api/dependents/:id', authenticate, (req, res) => {
     const { id } = req.params;
     const { full_name, date_of_birth, relationship, is_active } = req.body;
 
-    // التحقق من ملكية المكفول عبر الكافل
     db.get(
         `SELECT d.id FROM dependents d
          JOIN sponsors s ON d.sponsor_id = s.id
@@ -726,7 +812,7 @@ app.put('/api/dependents/:id', authenticate, (req, res) => {
 });
 
 // =============================================
-// API: حذف مكفول
+// 📌 API: حذف مكفول
 // =============================================
 app.delete('/api/dependents/:id', authenticate, (req, res) => {
     const { id } = req.params;
@@ -765,7 +851,7 @@ app.delete('/api/dependents/:id', authenticate, (req, res) => {
 });
 
 // =============================================
-// API: لوحة التحكم (Dashboard)
+// 📌 API: لوحة التحكم
 // =============================================
 app.get('/api/dashboard', authenticate, (req, res) => {
     const stats = {
@@ -865,12 +951,16 @@ app.get('/api/dashboard', authenticate, (req, res) => {
 });
 
 // =============================================
-// تشغيل الخادم
+// 🚀 تشغيل الخادم
 // =============================================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log('\n🚀 =========================================');
-    console.log(`🚀 الخادم يعمل على http://localhost:${PORT}`);
+    console.log(`🚀  نظام التأمين الطبي - الخادم يعمل`);
+    console.log(`🚀  المنفذ: ${PORT}`);
+    console.log(`🚀  البيئة: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🚀  الرابط: http://localhost:${PORT}`);
+    console.log(`🚀  حالة الصحة: http://localhost:${PORT}/health`);
     console.log('🚀 =========================================\n');
     console.log('📋 API Endpoints:');
     console.log('   POST   /api/auth/login                 - تسجيل الدخول');
@@ -883,8 +973,36 @@ app.listen(PORT, () => {
     console.log('   POST   /api/dependents                 - إضافة مكفول');
     console.log('   PUT    /api/dependents/:id             - تحديث مكفول');
     console.log('   DELETE /api/dependents/:id             - حذف مكفول');
-    console.log('   GET    /api/dashboard                  - لوحة التحكم\n');
+    console.log('   GET    /api/dashboard                  - لوحة التحكم');
+    console.log('   GET    /health                         - حالة الخادم\n');
     console.log('👤 المستخدم الافتراضي:');
     console.log('   📝 اسم المستخدم: admin');
     console.log('   📝 كلمة المرور: admin123\n');
 });
+
+// =============================================
+// 🛑 إغلاق قاعدة البيانات عند إيقاف الخادم
+// =============================================
+process.on('SIGINT', () => {
+    db.close((err) => {
+        if (err) {
+            console.error('❌ خطأ في إغلاق قاعدة البيانات:', err.message);
+        } else {
+            console.log('🔒 تم إغلاق قاعدة البيانات بنجاح');
+        }
+        process.exit(0);
+    });
+});
+
+process.on('SIGTERM', () => {
+    db.close((err) => {
+        if (err) {
+            console.error('❌ خطأ في إغلاق قاعدة البيانات:', err.message);
+        } else {
+            console.log('🔒 تم إغلاق قاعدة البيانات بنجاح');
+        }
+        process.exit(0);
+    });
+});
+
+module.exports = app;
