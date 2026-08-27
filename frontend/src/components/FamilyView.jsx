@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '../services/api';
 
 const FamilyView = () => {
     const [sponsors, setSponsors] = useState([]);
@@ -29,13 +30,14 @@ const FamilyView = () => {
     const fetchSponsors = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/sponsors');
-            const data = await response.json();
+            const response = await api.get('/sponsors');
+            const data = response.data;
             if (data.success) {
                 setSponsors(data.sponsors);
             }
         } catch (err) {
             setError('فشل في جلب البيانات');
+            console.error('❌ خطأ في جلب الكافلين:', err);
         } finally {
             setLoading(false);
         }
@@ -44,8 +46,8 @@ const FamilyView = () => {
     const fetchSponsorDetails = async (id) => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/sponsors/${id}`);
-            const data = await response.json();
+            const response = await api.get(`/sponsors/${id}`);
+            const data = response.data;
             if (data.success) {
                 setSelectedSponsor(data.sponsor);
                 setDependents(data.dependents);
@@ -53,6 +55,7 @@ const FamilyView = () => {
             }
         } catch (err) {
             setError('فشل في جلب تفاصيل الكافل');
+            console.error('❌ خطأ في جلب تفاصيل الكافل:', err);
         } finally {
             setLoading(false);
         }
@@ -83,10 +86,8 @@ const FamilyView = () => {
         
         if (window.confirm(`⚠️ هل أنت متأكد من حذف الكافل "${selectedSponsor.full_name}" وجميع المكفولين التابعين له؟`)) {
             try {
-                const response = await fetch(`http://localhost:5000/api/sponsors/${selectedSponsor.id}`, {
-                    method: 'DELETE'
-                });
-                const data = await response.json();
+                const response = await api.delete(`/sponsors/${selectedSponsor.id}`);
+                const data = response.data;
                 if (data.success) {
                     alert('✅ تم حذف الكافل وجميع المكفولين التابعين له بنجاح');
                     setSelectedSponsor(null);
@@ -97,6 +98,28 @@ const FamilyView = () => {
                 }
             } catch (err) {
                 alert('❌ فشل الاتصال بالخادم');
+                console.error('❌ خطأ في حذف الكافل:', err);
+            }
+        }
+    };
+
+    const handleDeleteDependent = async (id, name) => {
+        if (window.confirm(`هل أنت متأكد من حذف "${name}"؟`)) {
+            try {
+                const response = await api.delete(`/dependents/${id}`);
+                const data = response.data;
+                if (data.success) {
+                    alert('✅ تم حذف المكفول بنجاح');
+                    if (selectedSponsor) {
+                        fetchSponsorDetails(selectedSponsor.id);
+                    }
+                    fetchSponsors();
+                } else {
+                    alert('❌ ' + (data.message || 'حدث خطأ'));
+                }
+            } catch (err) {
+                alert('❌ فشل الاتصال بالخادم');
+                console.error('❌ خطأ في حذف المكفول:', err);
             }
         }
     };
@@ -245,13 +268,7 @@ const FamilyView = () => {
                                                         ✏️
                                                     </button>
                                                     <button 
-                                                        onClick={async () => {
-                                                            if (window.confirm(`هل أنت متأكد من حذف "${dep.full_name}"؟`)) {
-                                                                await fetch(`http://localhost:5000/api/dependents/${dep.id}`, { method: 'DELETE' });
-                                                                fetchSponsorDetails(selectedSponsor.id);
-                                                                fetchSponsors();
-                                                            }
-                                                        }}
+                                                        onClick={() => handleDeleteDependent(dep.id, dep.full_name)}
                                                         style={styles.deleteButton}
                                                     >
                                                         🗑️
@@ -358,19 +375,15 @@ const SponsorFormModal = ({ title, onClose, onSuccess, mode, sponsorData }) => {
         setLoading(true);
         setError('');
 
-        const url = mode === 'add' 
-            ? 'http://localhost:5000/api/sponsors'
-            : `http://localhost:5000/api/sponsors/${sponsorData.id}`;
-        
-        const method = mode === 'add' ? 'POST' : 'PUT';
-
         try {
-            const response = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-            const data = await response.json();
+            let response;
+            if (mode === 'add') {
+                response = await api.post('/sponsors', formData);
+            } else {
+                response = await api.put(`/sponsors/${sponsorData.id}`, formData);
+            }
+            
+            const data = response.data;
             if (data.success) {
                 alert(mode === 'add' ? '✅ تم إضافة الكافل بنجاح' : '✅ تم تحديث الكافل بنجاح');
                 onSuccess();
@@ -378,7 +391,7 @@ const SponsorFormModal = ({ title, onClose, onSuccess, mode, sponsorData }) => {
                 setError(data.message || 'حدث خطأ');
             }
         } catch (err) {
-            setError('فشل الاتصال بالخادم');
+            setError(err.response?.data?.message || 'فشل الاتصال بالخادم');
         } finally {
             setLoading(false);
         }
@@ -451,22 +464,18 @@ const DependentFormModal = ({ title, onClose, onSuccess, sponsorId, mode, depend
         setLoading(true);
         setError('');
 
-        const url = mode === 'add'
-            ? 'http://localhost:5000/api/dependents'
-            : `http://localhost:5000/api/dependents/${dependentData.id}`;
-        
-        const method = mode === 'add' ? 'POST' : 'PUT';
-        const body = mode === 'add' 
-            ? { sponsor_id: sponsorId, ...formData }
-            : formData;
-
         try {
-            const response = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            const data = await response.json();
+            let response;
+            if (mode === 'add') {
+                response = await api.post('/dependents', {
+                    sponsor_id: sponsorId,
+                    ...formData
+                });
+            } else {
+                response = await api.put(`/dependents/${dependentData.id}`, formData);
+            }
+            
+            const data = response.data;
             if (data.success) {
                 alert(data.message || (mode === 'add' ? '✅ تم إضافة المكفول بنجاح' : '✅ تم تحديث المكفول بنجاح'));
                 onSuccess();
@@ -474,7 +483,7 @@ const DependentFormModal = ({ title, onClose, onSuccess, sponsorId, mode, depend
                 setError(data.message || 'حدث خطأ');
             }
         } catch (err) {
-            setError('فشل الاتصال بالخادم');
+            setError(err.response?.data?.message || 'فشل الاتصال بالخادم');
         } finally {
             setLoading(false);
         }

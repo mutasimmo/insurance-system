@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from '../services/api';
 
 const AddSponsor = ({ isOpen, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
@@ -34,15 +35,9 @@ const AddSponsor = ({ isOpen, onClose, onSuccess }) => {
         };
 
         try {
-            const response = await fetch('http://localhost:5000/api/sponsors', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(dataToSend)
-            });
-
-            const data = await response.json();
+            // ✅ استخدام api بدلاً من fetch
+            const response = await api.post('/sponsors', dataToSend);
+            const data = response.data;
 
             if (data.success) {
                 alert(`✅ تم إضافة الكافل بنجاح! المعرف (ID): ${data.data.id}\n📅 مدة الاشتراك: سنة واحدة (${formData.subscription_start} → ${subscription_end})`);
@@ -59,7 +54,8 @@ const AddSponsor = ({ isOpen, onClose, onSuccess }) => {
                 setError(data.message || 'حدث خطأ');
             }
         } catch (err) {
-            setError('فشل الاتصال بالخادم');
+            console.error('❌ خطأ في إضافة الكافل:', err);
+            setError(err.response?.data?.message || 'فشل الاتصال بالخادم');
         } finally {
             setLoading(false);
         }

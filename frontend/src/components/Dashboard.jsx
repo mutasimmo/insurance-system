@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '../services/api'; // ✅ إضافة استيراد api
 import { 
     FaUsers, 
     FaUserPlus, 
@@ -28,10 +29,10 @@ const Dashboard = () => {
 
     const fetchDashboardData = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/dashboard');
-            const data = await response.json();
+            // ✅ استخدام api بدلاً من fetch
+            const response = await api.get('/dashboard');
+            const data = response.data;
             if (data.success) {
-                // تحديث الإحصائيات مع التأكد من وجود قيم
                 setStats({
                     total_sponsors: data.stats?.total_sponsors || 0,
                     total_dependents: data.stats?.total_dependents || 0,
@@ -43,13 +44,15 @@ const Dashboard = () => {
             }
         } catch (err) {
             setError('فشل في جلب الإحصائيات');
+            console.error('Dashboard error:', err);
         }
     };
 
     const fetchRecentSponsors = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/sponsors');
-            const data = await response.json();
+            // ✅ استخدام api بدلاً من fetch
+            const response = await api.get('/sponsors');
+            const data = response.data;
             if (data.success) {
                 setRecentSponsors(data.sponsors || []);
             }
@@ -64,7 +67,6 @@ const Dashboard = () => {
         fetchDashboardData();
         fetchRecentSponsors();
         
-        // تحديث البيانات كل 30 ثانية
         const interval = setInterval(() => {
             fetchDashboardData();
             fetchRecentSponsors();
