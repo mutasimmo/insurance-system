@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import api from '../services/api'; // ✅ إضافة استيراد api
+import React, { useState, useEffect, useCallback } from 'react';
+import PropTypes from 'prop-types';
+import api from '../services/api';
 import { 
     FaUsers, 
     FaUserPlus, 
@@ -27,9 +28,8 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
         try {
-            // ✅ استخدام api بدلاً من fetch
             const response = await api.get('/dashboard');
             const data = response.data;
             if (data.success) {
@@ -46,11 +46,10 @@ const Dashboard = () => {
             setError('فشل في جلب الإحصائيات');
             console.error('Dashboard error:', err);
         }
-    };
+    }, []);
 
-    const fetchRecentSponsors = async () => {
+    const fetchRecentSponsors = useCallback(async () => {
         try {
-            // ✅ استخدام api بدلاً من fetch
             const response = await api.get('/sponsors');
             const data = response.data;
             if (data.success) {
@@ -61,7 +60,7 @@ const Dashboard = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchDashboardData();
@@ -73,7 +72,7 @@ const Dashboard = () => {
         }, 30000);
         
         return () => clearInterval(interval);
-    }, []);
+    }, [fetchDashboardData, fetchRecentSponsors]);
 
     const calculateAge = (birthDate) => {
         if (!birthDate) return '—';
@@ -87,16 +86,31 @@ const Dashboard = () => {
         return age;
     };
 
+    const formatNumber = (num) => {
+        if (num >= 1000) {
+            return (num / 1000).toFixed(1) + 'k';
+        }
+        return num;
+    };
+
     const StatCard = ({ icon, title, value, color, subtitle }) => (
         <div className={`stat-card ${color}`}>
             <div className="stat-icon">{icon}</div>
             <div className="stat-content">
                 <h3>{title}</h3>
-                <p className="stat-number">{value || 0}</p>
+                <p className="stat-number">{formatNumber(value)}</p>
                 {subtitle && <span className="stat-subtitle">{subtitle}</span>}
             </div>
         </div>
     );
+
+    StatCard.propTypes = {
+        icon: PropTypes.node.isRequired,
+        title: PropTypes.string.isRequired,
+        value: PropTypes.number.isRequired,
+        color: PropTypes.string.isRequired,
+        subtitle: PropTypes.string
+    };
 
     if (loading) {
         return (
@@ -167,8 +181,10 @@ const Dashboard = () => {
                 <div className="chart-card">
                     <h3>📊 توزيع المكفولين حسب الفئة العمرية</h3>
                     {stats.total_dependents === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '30px', color: '#999' }}>
-                            🕊️ لا يوجد مكفولين حتى الآن
+                        <div className="empty-state">
+                            <span className="empty-icon">🕊️</span>
+                            <p>لا يوجد مكفولين حتى الآن</p>
+                            <small>أضف كافلاً جديداً للبدء</small>
                         </div>
                     ) : (
                         <div className="chart-bars">
@@ -212,8 +228,9 @@ const Dashboard = () => {
                 <div className="chart-card">
                     <h3>🕒 أحدث الكافلين</h3>
                     {recentSponsors.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                            🕊️ لا يوجد كافلين حتى الآن
+                        <div className="empty-state">
+                            <span className="empty-icon">🕊️</span>
+                            <p>لا يوجد كافلين حتى الآن</p>
                         </div>
                     ) : (
                         <div className="recent-sponsors">
