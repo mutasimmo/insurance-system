@@ -23,18 +23,16 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
 
 app.use(cors({
     origin: function (origin, callback) {
-        // السماح للطلبات بدون origin (مثل Postman)
         if (!origin) return callback(null, true);
         
         if (process.env.NODE_ENV === 'production') {
-            // في الإنتاج: تحقق من القائمة المسموحة
             if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('onrender.com')) {
                 callback(null, true);
             } else {
+                console.log('❌ CORS blocked:', origin);
                 callback(new Error('❌ غير مسموح بهذا النطاق'));
             }
         } else {
-            // في التطوير: السماح للجميع
             callback(null, true);
         }
     },
@@ -88,7 +86,6 @@ app.get('/', (req, res) => {
             dashboard: 'GET /api/dashboard',
             health: 'GET /health'
         },
-        documentation: 'https://github.com/your-username/medical-insurance',
         timestamp: new Date().toISOString()
     });
 });
@@ -111,7 +108,6 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // 📋 إنشاء الجداول
 // =============================================
 function createTables() {
-    // تفعيل المفاتيح الأجنبية
     db.run('PRAGMA foreign_keys = ON;');
 
     // جدول المستخدمين
@@ -186,7 +182,8 @@ async function createDefaultAdmin() {
             return;
         }
         if (row.count === 0) {
-            const hashedPassword = bcrypt.hashSync('admin123', 10);
+            // 🔐 كلمة المرور الجديدة
+            const hashedPassword = bcrypt.hashSync('Asmo@2026', 10);
             db.run(`
                 INSERT INTO users (username, password, full_name, is_admin)
                 VALUES (?, ?, ?, ?)
@@ -195,7 +192,7 @@ async function createDefaultAdmin() {
                     console.log('✅ ========================================');
                     console.log('✅ تم إنشاء مستخدم المدير الافتراضي');
                     console.log('📝 اسم المستخدم: admin');
-                    console.log('📝 كلمة المرور: admin123');
+                    console.log('📝 كلمة المرور: Asmo@2026');
                     console.log('✅ ========================================');
                 }
             });
@@ -977,7 +974,7 @@ const server = app.listen(PORT, () => {
     console.log('   GET    /health                         - حالة الخادم\n');
     console.log('👤 المستخدم الافتراضي:');
     console.log('   📝 اسم المستخدم: admin');
-    console.log('   📝 كلمة المرور: admin123\n');
+    console.log('   📝 كلمة المرور: Asmo@2026\n');
 });
 
 // =============================================
