@@ -9,9 +9,6 @@ import Register from './components/Register';
 import { authService } from './services/api';
 import './App.css';
 
-// =============================================
-// مكون خاص بالمسارات المحمية
-// =============================================
 const ProtectedRoute = ({ children, isLoggedIn }) => {
     const location = useLocation();
     if (!isLoggedIn) {
@@ -20,9 +17,6 @@ const ProtectedRoute = ({ children, isLoggedIn }) => {
     return children;
 };
 
-// =============================================
-// المكون الرئيسي للتطبيق
-// =============================================
 const AppContent = () => {
     const [currentPage, setCurrentPage] = useState('dashboard');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -87,7 +81,6 @@ const AppContent = () => {
 
     return (
         <div className="app">
-            {/* ✅ إضافة Toaster للإشعارات */}
             <Toaster
                 position="top-center"
                 reverseOrder={false}
@@ -102,15 +95,11 @@ const AppContent = () => {
                         padding: '16px 20px'
                     },
                     success: {
-                        style: {
-                            background: '#27ae60',
-                        },
+                        style: { background: '#27ae60' },
                         icon: '✅'
                     },
                     error: {
-                        style: {
-                            background: '#e74c3c',
-                        },
+                        style: { background: '#e74c3c' },
                         icon: '❌'
                     }
                 }}
@@ -167,14 +156,11 @@ const AppContent = () => {
     );
 };
 
-// =============================================
-// المكون الرئيسي مع Router
-// =============================================
 function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/login" element={<Login />} />
+                <Route path="/login" element={<Login onLogin={handleLogin} />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/*" element={<AppContent />} />
             </Routes>
