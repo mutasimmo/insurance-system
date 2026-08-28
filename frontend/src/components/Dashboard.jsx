@@ -134,6 +134,7 @@ const Dashboard = () => {
             </div>
         );
     }
+
     return (
         <div className="dashboard">
             <div className="dashboard-header">
@@ -250,12 +251,12 @@ const Dashboard = () => {
                             {recentSponsors.slice(0, 5).map(sponsor => (
                                 <div key={sponsor.id} className="recent-item">
                                     <div className="recent-avatar">
-                                        {sponsor.full_name.charAt(0)}
+                                        {sponsor.full_name?.charAt(0) || '?'}
                                     </div>
                                     <div className="recent-info">
                                         <div className="recent-name">{sponsor.full_name}</div>
                                         <div className="recent-details">
-                                            <span>👤 {sponsor.dependents_count || 0} مكفول</span>
+                                            <span>👤 {typeof sponsor.dependents_count === 'number' ? sponsor.dependents_count : 0} مكفول</span>
                                             <span>🎂 {calculateAge(sponsor.date_of_birth)} سنة</span>
                                         </div>
                                     </div>
