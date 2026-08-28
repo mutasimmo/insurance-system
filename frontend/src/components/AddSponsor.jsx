@@ -1,18 +1,32 @@
+// frontend/src/components/AddSponsor.jsx
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
 import api from '../services/api';
+import './AddSponsor.css';
 
 const AddSponsor = ({ isOpen, onClose, onSuccess }) => {
-    const [formData, setFormData] = useState({
-        full_name: '',
-        date_of_birth: '',
-        phone: '',
-        email: '',
-        subscription_start: ''
-    });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [apiError, setApiError] = useState('');
 
-    // حساب تاريخ الانتهاء (بعد سنة من تاريخ البدء)
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+        watch
+    } = useForm({
+        defaultValues: {
+            full_name: '',
+            date_of_birth: '',
+            phone: '',
+            email: '',
+            subscription_start: ''
+        }
+    });
+
+    const subscriptionStart = watch('subscription_start');
+
     const calculateEndDate = (startDate) => {
         if (!startDate) return '';
         const date = new Date(startDate);
@@ -21,41 +35,29 @@ const AddSponsor = ({ isOpen, onClose, onSuccess }) => {
         return date.toISOString().split('T')[0];
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const onSubmit = async (data) => {
         setLoading(true);
-        setError('');
+        setApiError('');
 
-        // حساب تاريخ الانتهاء تلقائياً
-        const subscription_end = calculateEndDate(formData.subscription_start);
-
-        const dataToSend = {
-            ...formData,
-            subscription_end
-        };
+        const subscription_end = calculateEndDate(data.subscription_start);
+        const dataToSend = { ...data, subscription_end };
 
         try {
-            // ✅ استخدام api بدلاً من fetch
             const response = await api.post('/sponsors', dataToSend);
-            const data = response.data;
-
-            if (data.success) {
-                alert(`✅ تم إضافة الكافل بنجاح! المعرف (ID): ${data.data.id}\n📅 مدة الاشتراك: سنة واحدة (${formData.subscription_start} → ${subscription_end})`);
-                setFormData({
-                    full_name: '',
-                    date_of_birth: '',
-                    phone: '',
-                    email: '',
-                    subscription_start: ''
-                });
+            if (response.data.success) {
+                toast.success(`✅ تم إضافة الكافل بنجاح! المعرف (ID): ${response.data.data.id}`);
+                reset();
                 onSuccess();
                 onClose();
             } else {
-                setError(data.message || 'حدث خطأ');
+                setApiError(response.data.message || 'حدث خطأ');
+                toast.error('❌ ' + (response.data.message || 'حدث خطأ'));
             }
         } catch (err) {
+            const message = err.response?.data?.message || 'فشل الاتصال بالخادم';
+            setApiError(message);
+            toast.error('❌ ' + message);
             console.error('❌ خطأ في إضافة الكافل:', err);
-            setError(err.response?.data?.message || 'فشل الاتصال بالخادم');
         } finally {
             setLoading(false);
         }
@@ -64,80 +66,116 @@ const AddSponsor = ({ isOpen, onClose, onSuccess }) => {
     if (!isOpen) return null;
 
     return (
-        <div style={styles.overlay} onClick={onClose}>
-            <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-                <h2 style={styles.title}>➕ إضافة كافل جديد</h2>
-                <p style={styles.note}>📅 مدة الاشتراك: سنة واحدة تلقائياً من تاريخ البدء</p>
+        <div className="add-sponsor-overlay" onClick={onClose}>
+            <div className="add-sponsor-modal" onClick={(e) => e.stopPropagation()}>
+                <h2 className="add-sponsor-title">➕ إضافة كافل جديد</h2>
+                <p className="add-sponsor-note">📅 مدة الاشتراك: سنة واحدة تلقائياً من تاريخ البدء</p>
                 
-                {error && <div style={styles.error}>{error}</div>}
+                {apiError && <div className="add-sponsor-error">{apiError}</div>}
 
-                <form onSubmit={handleSubmit} style={styles.form}>
-                    <div style={styles.group}>
+                <form onSubmit={handleSubmit(onSubmit)} className="add-sponsor-form">
+                    {/* الاسم الكامل */}
+                    <div className="add-sponsor-group">
                         <label>الاسم الكامل *</label>
                         <input
                             type="text"
-                            required
                             placeholder="أدخل الاسم الكامل"
-                            value={formData.full_name}
-                            onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                            style={styles.input}
+                            className={`add-sponsor-input ${errors.full_name ? 'input-error' : ''}`}
+                            {...register('full_name', {
+                                required: 'الاسم الكامل مطلوب',
+                                minLength: {
+                                    value: 3,
+                                    message: 'الاسم يجب أن يكون 3 أحرف على الأقل'
+                                },
+                                maxLength: {
+                                    value: 100,
+                                    message: 'الاسم طويل جداً'
+                                }
+                            })}
                         />
+                        {errors.full_name && (
+                            <span className="error-text">{errors.full_name.message}</span>
+                        )}
                     </div>
 
-                    <div style={styles.group}>
+                    {/* تاريخ الميلاد */}
+                    <div className="add-sponsor-group">
                         <label>تاريخ الميلاد *</label>
                         <input
                             type="date"
-                            required
-                            value={formData.date_of_birth}
-                            onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
-                            style={styles.input}
+                            className={`add-sponsor-input ${errors.date_of_birth ? 'input-error' : ''}`}
+                            {...register('date_of_birth', {
+                                required: 'تاريخ الميلاد مطلوب'
+                            })}
                         />
+                        {errors.date_of_birth && (
+                            <span className="error-text">{errors.date_of_birth.message}</span>
+                        )}
                     </div>
 
-                    <div style={styles.group}>
+                    {/* تاريخ بدء الاشتراك */}
+                    <div className="add-sponsor-group">
                         <label>تاريخ بدء الاشتراك *</label>
                         <input
                             type="date"
-                            required
-                            value={formData.subscription_start}
-                            onChange={(e) => setFormData({...formData, subscription_start: e.target.value})}
-                            style={styles.input}
+                            className={`add-sponsor-input ${errors.subscription_start ? 'input-error' : ''}`}
+                            {...register('subscription_start', {
+                                required: 'تاريخ بدء الاشتراك مطلوب'
+                            })}
                         />
-                        {formData.subscription_start && (
-                            <small style={styles.hint}>
-                                📅 ينتهي الاشتراك في: {calculateEndDate(formData.subscription_start)}
+                        {errors.subscription_start && (
+                            <span className="error-text">{errors.subscription_start.message}</span>
+                        )}
+                        {subscriptionStart && (
+                            <small className="add-sponsor-hint">
+                                📅 ينتهي الاشتراك في: {calculateEndDate(subscriptionStart)}
                             </small>
                         )}
                     </div>
 
-                    <div style={styles.group}>
+                    {/* الهاتف */}
+                    <div className="add-sponsor-group">
                         <label>الهاتف (اختياري)</label>
                         <input
                             type="text"
                             placeholder="أدخل رقم الهاتف"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                            style={styles.input}
+                            className="add-sponsor-input"
+                            {...register('phone', {
+                                pattern: {
+                                    value: /^[0-9+\-\s()]*$/,
+                                    message: 'رقم الهاتف غير صحيح'
+                                }
+                            })}
                         />
+                        {errors.phone && (
+                            <span className="error-text">{errors.phone.message}</span>
+                        )}
                     </div>
 
-                    <div style={styles.group}>
+                    {/* البريد الإلكتروني */}
+                    <div className="add-sponsor-group">
                         <label>البريد الإلكتروني (اختياري)</label>
                         <input
                             type="email"
                             placeholder="أدخل البريد الإلكتروني"
-                            value={formData.email}
-                            onChange={(e) => setFormData({...formData, email: e.target.value})}
-                            style={styles.input}
+                            className="add-sponsor-input"
+                            {...register('email', {
+                                pattern: {
+                                    value: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
+                                    message: 'البريد الإلكتروني غير صحيح'
+                                }
+                            })}
                         />
+                        {errors.email && (
+                            <span className="error-text">{errors.email.message}</span>
+                        )}
                     </div>
 
-                    <div style={styles.buttons}>
-                        <button type="submit" style={styles.submit} disabled={loading}>
+                    <div className="add-sponsor-buttons">
+                        <button type="submit" className="add-sponsor-submit" disabled={loading}>
                             {loading ? '⏳ جاري الإضافة...' : '✅ إضافة كافل'}
                         </button>
-                        <button type="button" onClick={onClose} style={styles.cancel}>
+                        <button type="button" onClick={onClose} className="add-sponsor-cancel">
                             ❌ إلغاء
                         </button>
                     </div>
@@ -145,102 +183,6 @@ const AddSponsor = ({ isOpen, onClose, onSuccess }) => {
             </div>
         </div>
     );
-};
-
-const styles = {
-    overlay: {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-        backdropFilter: 'blur(3px)'
-    },
-    modal: {
-        backgroundColor: 'white',
-        padding: '35px',
-        borderRadius: '15px',
-        width: '95%',
-        maxWidth: '550px',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
-    },
-    title: {
-        textAlign: 'center',
-        color: '#2c3e50',
-        marginBottom: '5px',
-        borderBottom: '2px solid #3498db',
-        paddingBottom: '10px'
-    },
-    note: {
-        textAlign: 'center',
-        color: '#27ae60',
-        fontSize: '14px',
-        marginBottom: '20px'
-    },
-    error: {
-        backgroundColor: '#fde8e8',
-        color: '#e74c3c',
-        padding: '10px',
-        borderRadius: '8px',
-        marginBottom: '15px',
-        textAlign: 'center'
-    },
-    hint: {
-        color: '#7f8c8d',
-        fontSize: '13px',
-        marginTop: '5px'
-    },
-    form: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px'
-    },
-    group: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '5px'
-    },
-    input: {
-        padding: '12px 14px',
-        borderRadius: '8px',
-        border: '2px solid #ddd',
-        fontSize: '15px',
-        transition: 'border 0.3s'
-    },
-    buttons: {
-        display: 'flex',
-        gap: '12px',
-        marginTop: '15px'
-    },
-    submit: {
-        flex: 1,
-        padding: '14px',
-        backgroundColor: '#27ae60',
-        color: 'white',
-        border: 'none',
-        borderRadius: '8px',
-        fontSize: '16px',
-        cursor: 'pointer',
-        transition: 'background 0.3s'
-    },
-    cancel: {
-        flex: 1,
-        padding: '14px',
-        backgroundColor: '#e74c3c',
-        color: 'white',
-        border: 'none',
-        borderRadius: '8px',
-        fontSize: '16px',
-        cursor: 'pointer',
-        transition: 'background 0.3s'
-    }
 };
 
 export default AddSponsor;
