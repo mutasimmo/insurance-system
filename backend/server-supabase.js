@@ -56,7 +56,6 @@ app.use(express.urlencoded({ extended: true }));
 // =============================================
 app.get('/health', async (req, res) => {
     try {
-        // اختبار الاتصال بـ Supabase
         const { data, error } = await supabase.from('users').select('count', { count: 'exact', head: true });
         
         if (error) throw error;
@@ -120,7 +119,6 @@ app.get('/', (req, res) => {
 // 📋 إنشاء الجداول (إذا لم تكن موجودة)
 // =============================================
 async function createTables() {
-    // Supabase يستخدم SQL، سنقوم بإنشاء الجداول عبر SQL
     const createUsersSQL = `
         CREATE TABLE IF NOT EXISTS users (
             id BIGSERIAL PRIMARY KEY,
@@ -166,7 +164,6 @@ async function createTables() {
         await createDefaultAdmin();
     } catch (error) {
         console.error('❌ خطأ في إنشاء الجداول:', error.message);
-        // إذا فشل exec_sql، جرب طريقة بديلة
         console.log('⚠️ تأكد من إنشاء الجداول يدوياً في Supabase');
     }
 }
@@ -352,7 +349,6 @@ app.post('/api/auth/register', async (req, res) => {
     }
 
     try {
-        // التحقق من عدم وجود المستخدم
         const { data: existingUser } = await supabase
             .from('users')
             .select('id')
@@ -666,7 +662,6 @@ app.post('/api/dependents', authenticate, async (req, res) => {
     }
 
     try {
-        // التحقق من ملكية الكافل
         const { data: sponsor, error: sponsorError } = await supabase
             .from('sponsors')
             .select('id, full_name')
@@ -741,7 +736,6 @@ app.put('/api/dependents/:id', authenticate, async (req, res) => {
     }
 
     try {
-        // التحقق من ملكية المكفول
         const { data: dependent, error: checkError } = await supabase
             .from('dependents')
             .select('id')
@@ -830,7 +824,6 @@ app.get('/api/dashboard', authenticate, async (req, res) => {
             expiring_soon: 0
         };
 
-        // إجمالي الكافلين
         const { count: sponsorsCount, error: sError } = await supabase
             .from('sponsors')
             .select('id', { count: 'exact', head: true })
@@ -839,7 +832,6 @@ app.get('/api/dashboard', authenticate, async (req, res) => {
 
         if (!sError) stats.total_sponsors = sponsorsCount || 0;
 
-        // إجمالي المكفولين
         const { count: dependentsCount, error: dError } = await supabase
             .from('dependents')
             .select('id', { count: 'exact', head: true })
@@ -848,7 +840,6 @@ app.get('/api/dashboard', authenticate, async (req, res) => {
 
         if (!dError) stats.total_dependents = dependentsCount || 0;
 
-        // المكفولين حسب العمر
         const { data: dependentsData, error: ageError } = await supabase
             .from('dependents')
             .select('date_of_birth')
@@ -864,7 +855,6 @@ app.get('/api/dashboard', authenticate, async (req, res) => {
             });
         }
 
-        // اشتراكات منتهية قريباً
         const today = new Date();
         const thirtyDaysLater = new Date();
         thirtyDaysLater.setDate(today.getDate() + 30);
@@ -898,33 +888,30 @@ app.get('/api/dashboard', authenticate, async (req, res) => {
 // =============================================
 const PORT = process.env.PORT || 5000;
 
-// تهيئة الجداول عند بدء التشغيل
-createTables().then(() => {
-    app.listen(PORT, () => {
-        console.log('\n🚀 =========================================');
-        console.log(`🚀  نظام التأمين الطبي - الخادم يعمل (Supabase)`);
-        console.log(`🚀  المنفذ: ${PORT}`);
-        console.log(`🚀  البيئة: ${process.env.NODE_ENV || 'development'}`);
-        console.log(`🚀  الرابط: http://localhost:${PORT}`);
-        console.log(`🚀  حالة الصحة: http://localhost:${PORT}/health`);
-        console.log('🚀 =========================================\n');
-        console.log('📋 API Endpoints:');
-        console.log('   POST   /api/auth/login                 - تسجيل الدخول');
-        console.log('   POST   /api/auth/register              - تسجيل حساب جديد');
-        console.log('   GET    /api/auth/verify                - التحقق من التوكن');
-        console.log('   GET    /api/sponsors                   - جلب الكافلين');
-        console.log('   POST   /api/sponsors                   - إضافة كافل');
-        console.log('   PUT    /api/sponsors/:id               - تحديث كافل');
-        console.log('   DELETE /api/sponsors/:id               - حذف كافل');
-        console.log('   POST   /api/dependents                 - إضافة مكفول');
-        console.log('   PUT    /api/dependents/:id             - تحديث مكفول');
-        console.log('   DELETE /api/dependents/:id             - حذف مكفول');
-        console.log('   GET    /api/dashboard                  - لوحة التحكم');
-        console.log('   GET    /health                         - حالة الخادم\n');
-        console.log('👤 المستخدم الافتراضي:');
-        console.log('   📝 اسم المستخدم: admin');
-        console.log('   📝 كلمة المرور: Asmo@2026\n');
-    });
+app.listen(PORT, () => {
+    console.log('\n🚀 =========================================');
+    console.log(`🚀  نظام التأمين الطبي - الخادم يعمل (Supabase)`);
+    console.log(`🚀  المنفذ: ${PORT}`);
+    console.log(`🚀  البيئة: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🚀  الرابط: http://localhost:${PORT}`);
+    console.log(`🚀  حالة الصحة: http://localhost:${PORT}/health`);
+    console.log('🚀 =========================================\n');
+    console.log('📋 API Endpoints:');
+    console.log('   POST   /api/auth/login                 - تسجيل الدخول');
+    console.log('   POST   /api/auth/register              - تسجيل حساب جديد');
+    console.log('   GET    /api/auth/verify                - التحقق من التوكن');
+    console.log('   GET    /api/sponsors                   - جلب الكافلين');
+    console.log('   POST   /api/sponsors                   - إضافة كافل');
+    console.log('   PUT    /api/sponsors/:id               - تحديث كافل');
+    console.log('   DELETE /api/sponsors/:id               - حذف كافل');
+    console.log('   POST   /api/dependents                 - إضافة مكفول');
+    console.log('   PUT    /api/dependents/:id             - تحديث مكفول');
+    console.log('   DELETE /api/dependents/:id             - حذف مكفول');
+    console.log('   GET    /api/dashboard                  - لوحة التحكم');
+    console.log('   GET    /health                         - حالة الخادم\n');
+    console.log('👤 المستخدم الافتراضي:');
+    console.log('   📝 اسم المستخدم: admin');
+    console.log('   📝 كلمة المرور: Asmo@2026\n');
 });
 
 module.exports = app;
