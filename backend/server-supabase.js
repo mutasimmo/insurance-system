@@ -429,6 +429,7 @@ app.get('/api/auth/verify', authenticate, async (req, res) => {
 // =============================================
 app.get('/api/sponsors', authenticate, async (req, res) => {
     try {
+        // 1. جلب الكافلين بدون dependents_count
         const { data: sponsors, error } = await supabase
             .from('sponsors')
             .select(`
@@ -437,8 +438,7 @@ app.get('/api/sponsors', authenticate, async (req, res) => {
                 date_of_birth,
                 subscription_start,
                 subscription_end,
-                is_active,
-                dependents_count: dependents(count)
+                is_active
             `)
             .eq('user_id', req.userId)
             .eq('is_active', true)
@@ -446,9 +446,23 @@ app.get('/api/sponsors', authenticate, async (req, res) => {
 
         if (error) throw error;
 
+        // 2. جلب عدد المكفولين لكل كافل بشكل منفصل
+        const sponsorsWithCount = await Promise.all((sponsors || []).map(async (sponsor) => {
+            const { count, error: countError } = await supabase
+                .from('dependents')
+                .select('id', { count: 'exact', head: true })
+                .eq('sponsor_id', sponsor.id)
+                .eq('is_active', true);
+
+            return {
+                ...sponsor,
+                dependents_count: countError ? 0 : count || 0  // ✅ رقم وليس كائن
+            };
+        }));
+
         res.json({
             success: true,
-            sponsors: sponsors || [],
+            sponsors: sponsorsWithCount || [],
             total: sponsors ? sponsors.length : 0
         });
     } catch (error) {
