@@ -70,6 +70,11 @@ const AppContent = () => {
         );
     }
 
+    // ✅ إذا لم يكن المستخدم مسجلاً، عرض صفحة Login
+    if (!isLoggedIn) {
+        return <Login onLogin={handleLogin} />;
+    }
+
     const navigateTo = (page) => {
         setCurrentPage(page);
         if (page === 'dashboard') {
@@ -160,7 +165,6 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/login" element={<Login onLogin={handleLogin} />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/*" element={<AppContent />} />
             </Routes>
