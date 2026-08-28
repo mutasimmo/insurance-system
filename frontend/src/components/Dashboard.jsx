@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import api from '../services/api';
 import { 
     FaUsers, 
@@ -98,7 +100,9 @@ const Dashboard = () => {
             <div className="stat-icon">{icon}</div>
             <div className="stat-content">
                 <h3>{title}</h3>
-                <p className="stat-number">{formatNumber(value)}</p>
+                <p className="stat-number">
+                    {loading ? <Skeleton width={60} /> : formatNumber(value)}
+                </p>
                 {subtitle && <span className="stat-subtitle">{subtitle}</span>}
             </div>
         </div>
@@ -114,13 +118,22 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <div className="dashboard-loading">
-                <div className="loader"></div>
-                <p>⏳ جاري تحميل البيانات...</p>
+            <div className="dashboard">
+                <div className="dashboard-header">
+                    <Skeleton height={40} width={200} />
+                    <Skeleton height={20} width={300} />
+                </div>
+                <div className="stats-grid">
+                    {[1, 2, 3, 4, 5, 6].map(i => (
+                        <div key={i} className="stat-card">
+                            <Skeleton circle height={50} width={50} />
+                            <Skeleton height={30} width={100} />
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }
-
     return (
         <div className="dashboard">
             <div className="dashboard-header">

@@ -1,0 +1,120 @@
+/* frontend/src/components/ConfirmDialog.css */
+.confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+}
+
+.confirm-modal {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+    direction: rtl;
+}
+
+.confirm-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.confirm-title {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-family: 'Cairo', sans-serif;
+}
+
+.confirm-message {
+    font-size: 16px;
+    color: #7f8c8d;
+    margin-bottom: 25px;
+    line-height: 1.6;
+    font-family: 'Cairo', sans-serif;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.confirm-btn {
+    flex: 1;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Cairo', sans-serif;
+}
+
+.confirm-btn-yes {
+    background: #e74c3c;
+    color: white;
+}
+
+.confirm-btn-yes:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.confirm-btn-no {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
+.confirm-btn-no:hover {
+    background: #dde1e3;
+    transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .confirm-modal {
+        padding: 30px 20px;
+        max-width: 95%;
+    }
+
+    .confirm-title {
+        font-size: 20px;
+    }
+
+    .confirm-buttons {
+        flex-direction: column;
+    }
+
+    .confirm-btn {
+        width: 100%;
+    }
+}

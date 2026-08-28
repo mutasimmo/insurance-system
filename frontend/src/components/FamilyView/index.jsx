@@ -8,10 +8,10 @@ import StatsCards from './components/StatsCards';
 import DependentsTable from './components/DependentsTable';
 import SponsorFormModal from './components/SponsorFormModal';
 import DependentFormModal from './components/DependentFormModal';
+import ConfirmDialog from '../ConfirmDialog';
 import './FamilyView.css';
 
 const FamilyView = () => {
-    // ✅ تم حذف: setStatistics, setLoading, setError
     const {
         sponsors,
         selectedSponsor,
@@ -31,43 +31,64 @@ const FamilyView = () => {
     const [showEditDependent, setShowEditDependent] = useState(false);
     const [selectedDependent, setSelectedDependent] = useState(null);
 
+    // State لنافذة التأكيد
+    const [confirmDialog, setConfirmDialog] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: null
+    });
+
     const handleSelectSponsor = (id) => {
         fetchSponsorDetails(id);
     };
 
-    const handleDeleteSponsor = async () => {
+    // استخدام ConfirmDialog بدلاً من window.confirm
+    const handleDeleteSponsor = () => {
         if (!selectedSponsor) return;
         
-        if (window.confirm(`⚠️ هل أنت متأكد من حذف الكافل "${selectedSponsor.full_name}" وجميع المكفولين التابعين له؟`)) {
-            try {
-                const response = await api.delete(`/sponsors/${selectedSponsor.id}`);
-                if (response.data.success) {
-                    alert('✅ تم حذف الكافل وجميع المكفولين التابعين له بنجاح');
-                    setSelectedSponsor(null);
-                    setDependents([]);
-                    fetchSponsors();
+        setConfirmDialog({
+            isOpen: true,
+            title: '⚠️ تأكيد حذف الكافل',
+            message: `هل أنت متأكد من حذف الكافل "${selectedSponsor.full_name}" وجميع المكفولين التابعين له؟`,
+            onConfirm: async () => {
+                try {
+                    const response = await api.delete(`/sponsors/${selectedSponsor.id}`);
+                    if (response.data.success) {
+                        alert('✅ تم حذف الكافل وجميع المكفولين التابعين له بنجاح');
+                        setSelectedSponsor(null);
+                        setDependents([]);
+                        fetchSponsors();
+                    }
+                } catch (err) {
+                    alert('❌ فشل الاتصال بالخادم');
                 }
-            } catch (err) {
-                alert('❌ فشل الاتصال بالخادم');
+                setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: null });
             }
-        }
+        });
     };
 
-    const handleDeleteDependent = async (id, name) => {
-        if (window.confirm(`⚠️ هل أنت متأكد من حذف "${name}"؟`)) {
-            try {
-                const response = await api.delete(`/dependents/${id}`);
-                if (response.data.success) {
-                    alert('✅ تم حذف المكفول بنجاح');
-                    if (selectedSponsor) {
-                        fetchSponsorDetails(selectedSponsor.id);
+    const handleDeleteDependent = (id, name) => {
+        setConfirmDialog({
+            isOpen: true,
+            title: '⚠️ تأكيد حذف المكفول',
+            message: `هل أنت متأكد من حذف "${name}"؟`,
+            onConfirm: async () => {
+                try {
+                    const response = await api.delete(`/dependents/${id}`);
+                    if (response.data.success) {
+                        alert('✅ تم حذف المكفول بنجاح');
+                        if (selectedSponsor) {
+                            fetchSponsorDetails(selectedSponsor.id);
+                        }
+                        fetchSponsors();
                     }
-                    fetchSponsors();
+                } catch (err) {
+                    alert('❌ فشل الاتصال بالخادم');
                 }
-            } catch (err) {
-                alert('❌ فشل الاتصال بالخادم');
+                setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: null });
             }
-        }
+        });
     };
 
     return (
@@ -200,6 +221,15 @@ const FamilyView = () => {
                     dependentData={selectedDependent}
                 />
             )}
+
+            {/* ✅ ConfirmDialog - هنا في النهاية */}
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                onClose={() => setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: null })}
+                onConfirm={confirmDialog.onConfirm}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+            />
         </div>
     );
 };
