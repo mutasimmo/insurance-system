@@ -9,6 +9,9 @@ import Register from './components/Register';
 import { authService } from './services/api';
 import './App.css';
 
+// =============================================
+// مكون حماية المسارات
+// =============================================
 const ProtectedRoute = ({ children, isLoggedIn }) => {
     const location = useLocation();
     if (!isLoggedIn) {
@@ -17,6 +20,9 @@ const ProtectedRoute = ({ children, isLoggedIn }) => {
     return children;
 };
 
+// =============================================
+// المكون الرئيسي
+// =============================================
 const AppContent = () => {
     const [currentPage, setCurrentPage] = useState('dashboard');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -24,6 +30,7 @@ const AppContent = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    // التحقق من الجلسة
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -47,12 +54,14 @@ const AppContent = () => {
         }
     }, []);
 
+    // ✅ دالة تسجيل الدخول
     const handleLogin = (userData) => {
         setUser(userData);
         setIsLoggedIn(true);
         navigate('/');
     };
 
+    // ✅ دالة تسجيل الخروج
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -61,6 +70,7 @@ const AppContent = () => {
         navigate('/login');
     };
 
+    // شاشة التحميل
     if (loading) {
         return (
             <div className="loading-screen">
@@ -75,6 +85,7 @@ const AppContent = () => {
         return <Login onLogin={handleLogin} />;
     }
 
+    // ✅ التنقل بين الصفحات
     const navigateTo = (page) => {
         setCurrentPage(page);
         if (page === 'dashboard') {
@@ -84,6 +95,7 @@ const AppContent = () => {
         }
     };
 
+    // ✅ الواجهة الرئيسية
     return (
         <div className="app">
             <Toaster
@@ -161,6 +173,9 @@ const AppContent = () => {
     );
 };
 
+// =============================================
+// المكون الرئيسي مع Router
+// =============================================
 function App() {
     return (
         <Router>
