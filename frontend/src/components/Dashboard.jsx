@@ -95,6 +95,16 @@ const Dashboard = () => {
         return num;
     };
 
+    // ✅ دالة مساعدة لاستخراج عدد المكفولين بأمان
+    const getDependentsCount = (sponsor) => {
+        if (!sponsor) return 0;
+        const count = sponsor.dependents_count;
+        if (typeof count === 'object' && count !== null) {
+            return count.count || 0;
+        }
+        return count || 0;
+    };
+
     const StatCard = ({ icon, title, value, color, subtitle }) => (
         <div className={`stat-card ${color}`}>
             <div className="stat-icon">{icon}</div>
@@ -248,36 +258,24 @@ const Dashboard = () => {
                         </div>
                     ) : (
                         <div className="recent-sponsors">
-    {recentSponsors.slice(0, 5).map(sponsor => {
-        // استخراج عدد المكفولين بشكل صحيح
-        let dependentsCount = 0;
-        if (sponsor.dependents_count) {
-            if (typeof sponsor.dependents_count === 'object') {
-                dependentsCount = sponsor.dependents_count.count || 0;
-            } else {
-                dependentsCount = sponsor.dependents_count;
-            }
-        }
-        
-        return (
-            <div key={sponsor.id} className="recent-item">
-                <div className="recent-avatar">
-                    {sponsor.full_name?.charAt(0) || '?'}
-                </div>
-                <div className="recent-info">
-                    <div className="recent-name">{sponsor.full_name}</div>
-                    <div className="recent-details">
-                        <span>👤 {dependentsCount} مكفول</span>
-                        <span>🎂 {calculateAge(sponsor.date_of_birth)} سنة</span>
-                    </div>
-                </div>
-                <span className={`recent-status ${sponsor.is_active ? 'active' : 'inactive'}`}>
-                    {sponsor.is_active ? '✅ نشط' : '❌ غير نشط'}
-                </span>
-            </div>
-        );
-    })}
-</div>
+                            {recentSponsors.slice(0, 5).map(sponsor => (
+                                <div key={sponsor.id} className="recent-item">
+                                    <div className="recent-avatar">
+                                        {sponsor.full_name?.charAt(0) || '?'}
+                                    </div>
+                                    <div className="recent-info">
+                                        <div className="recent-name">{sponsor.full_name}</div>
+                                        <div className="recent-details">
+                                            <span>👤 {getDependentsCount(sponsor)} مكفول</span>
+                                            <span>🎂 {calculateAge(sponsor.date_of_birth)} سنة</span>
+                                        </div>
+                                    </div>
+                                    <span className={`recent-status ${sponsor.is_active ? 'active' : 'inactive'}`}>
+                                        {sponsor.is_active ? '✅ نشط' : '❌ غير نشط'}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </div>
             </div>

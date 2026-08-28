@@ -425,11 +425,10 @@ app.get('/api/auth/verify', authenticate, async (req, res) => {
 });
 
 // =============================================
-// 📌 API: جلب جميع الكافلين
+// 📌 API: جلب جميع الكافلين (معدل)
 // =============================================
 app.get('/api/sponsors', authenticate, async (req, res) => {
     try {
-        // 1. جلب الكافلين بدون dependents_count
         const { data: sponsors, error } = await supabase
             .from('sponsors')
             .select(`
@@ -446,7 +445,6 @@ app.get('/api/sponsors', authenticate, async (req, res) => {
 
         if (error) throw error;
 
-        // 2. جلب عدد المكفولين لكل كافل بشكل منفصل
         const sponsorsWithCount = await Promise.all((sponsors || []).map(async (sponsor) => {
             const { count, error: countError } = await supabase
                 .from('dependents')
@@ -456,7 +454,7 @@ app.get('/api/sponsors', authenticate, async (req, res) => {
 
             return {
                 ...sponsor,
-                dependents_count: countError ? 0 : count || 0  // ✅ رقم وليس كائن
+                dependents_count: countError ? 0 : count || 0
             };
         }));
 
@@ -825,7 +823,7 @@ app.delete('/api/dependents/:id', authenticate, async (req, res) => {
 });
 
 // =============================================
-// 📌 API: لوحة التحكم
+// 📌 API: لوحة التحكم (معدل)
 // =============================================
 app.get('/api/dashboard', authenticate, async (req, res) => {
     try {
@@ -838,37 +836,43 @@ app.get('/api/dashboard', authenticate, async (req, res) => {
             expiring_soon: 0
         };
 
+        // ✅ 1. إجمالي الكافلين
         const { count: sponsorsCount, error: sError } = await supabase
             .from('sponsors')
             .select('id', { count: 'exact', head: true })
             .eq('user_id', req.userId)
             .eq('is_active', true);
 
-        if (!sError) stats.total_sponsors = sponsorsCount || 0;
-
-        const { count: dependentsCount, error: dError } = await supabase
-            .from('dependents')
-            .select('id', { count: 'exact', head: true })
-            .eq('sponsors.user_id', req.userId)
-            .eq('is_active', true);
-
-        if (!dError) stats.total_dependents = dependentsCount || 0;
-
-        const { data: dependentsData, error: ageError } = await supabase
-            .from('dependents')
-            .select('date_of_birth')
-            .eq('sponsors.user_id', req.userId)
-            .eq('is_active', true);
-
-        if (!ageError && dependentsData) {
-            dependentsData.forEach(row => {
-                const age = calculateAge(row.date_of_birth);
-                if (age < 18) stats.children++;
-                else if (age >= 18 && age <= 60) stats.adults++;
-                else if (age > 60) stats.seniors++;
-            });
+        if (sError) {
+            console.error('❌ خطأ في جلب الكافلين:', sError);
+        } else {
+            stats.total_sponsors = sponsorsCount || 0;
         }
 
+        // ✅ 2. إجمالي المكفولين (طريقة صحيحة)
+        const { data: dependentsData, error: dError } = await supabase
+            .from('dependents')
+            .select('id, date_of_birth, sponsors!inner(user_id)')
+            .eq('sponsors.user_id', req.userId)
+            .eq('is_active', true);
+
+        if (dError) {
+            console.error('❌ خطأ في جلب المكفولين:', dError);
+        } else {
+            stats.total_dependents = dependentsData ? dependentsData.length : 0;
+            
+            // ✅ 3. تصنيف المكفولين حسب العمر
+            if (dependentsData) {
+                dependentsData.forEach(row => {
+                    const age = calculateAge(row.date_of_birth);
+                    if (age < 18) stats.children++;
+                    else if (age >= 18 && age <= 60) stats.adults++;
+                    else if (age > 60) stats.seniors++;
+                });
+            }
+        }
+
+        // ✅ 4. اشتراكات منتهية قريباً
         const today = new Date();
         const thirtyDaysLater = new Date();
         thirtyDaysLater.setDate(today.getDate() + 30);
@@ -881,7 +885,11 @@ app.get('/api/dashboard', authenticate, async (req, res) => {
             .gte('subscription_end', today.toISOString().split('T')[0])
             .lte('subscription_end', thirtyDaysLater.toISOString().split('T')[0]);
 
-        if (!expError) stats.expiring_soon = expiringData ? expiringData.length : 0;
+        if (expError) {
+            console.error('❌ خطأ في جلب الاشتراكات المنتهية:', expError);
+        } else {
+            stats.expiring_soon = expiringData ? expiringData.length : 0;
+        }
 
         res.json({
             success: true,
